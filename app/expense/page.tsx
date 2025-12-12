@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "@/components/ToastProvider";
 import { useEffect, useState } from "react";
 
 export default function ExpensePage() {
@@ -20,16 +21,16 @@ export default function ExpensePage() {
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   async function loadExpenses() {
-    if (!token) {
-      alert("Not logged in");
-      return;
-    }
+    if (!token) return toast("Not logged in");
+
     const res = await fetch("/api/expense/list", {
       headers: { Authorization: "Bearer " + token },
     });
+
     const data = await res.json();
     setExpenses(data.expenses || []);
   }
+
   useEffect(() => {
     loadExpenses();
   }, []);
@@ -42,7 +43,7 @@ export default function ExpensePage() {
       method: "POST",
       headers: {
         Authorization: "Bearer " + token,
-        "Content-Type": "applications/json",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         amount: Number(amount),
@@ -52,18 +53,16 @@ export default function ExpensePage() {
         date,
       }),
     });
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.error);
-      return;
-    }
 
-    alert("Expense added!");
+    const data = await res.json();
+    if (!res.ok) return toast(data.error);
+
     setAmount("");
     setItem("");
     setMerchant("");
     setNotes("");
     setDate("");
+
     loadExpenses();
   }
 
@@ -74,16 +73,14 @@ export default function ExpensePage() {
       method: "DELETE",
       headers: {
         Authorization: "Bearer " + token,
-        "Content-Type": "applications/json",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ expenseId: id }),
     });
+
     const data = await res.json();
-    if (!res.ok) {
-      alert(data.error);
-      return;
-    }
-    alert("Expense deleted!");
+    if (!res.ok) return toast(data.error);
+
     loadExpenses();
   }
 
@@ -95,7 +92,7 @@ export default function ExpensePage() {
       method: "PUT",
       headers: {
         Authorization: "Bearer " + token,
-        "Content-Type": "applications/json",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         expenseId: editId,
@@ -105,13 +102,10 @@ export default function ExpensePage() {
         notes: editNotes,
       }),
     });
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.error);
-      return;
-    }
 
-    alert("Expense updated!");
+    const data = await res.json();
+    if (!res.ok) return toast(data.error);
+
     setEditId(null);
     loadExpenses();
   }
@@ -125,93 +119,151 @@ export default function ExpensePage() {
   }
 
   return (
-    <div>
-      <h1>Expense Page</h1>
-      <h2>Add Expense</h2>
-      <form onSubmit={handleAdd}>
-        <div>
-          <label>Amount: </label>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Left side */}
+      <div className="md:col-span-1 bg-white border border-gray-200 p-5 rounded-lg shadow-sm">
+        <h1 className="text-xl font-semibold mb-4">Add Expense</h1>
+
+        <form onSubmit={handleAdd} className="flex flex-col gap-3">
           <input
+            className="border border-gray-300 px-3 py-2 rounded-md"
+            placeholder="Amount"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             required
           />
-        </div>
-        <div>
-          <label>Item: </label>
+
           <input
+            className="border border-gray-300 px-3 py-2 rounded-md"
+            placeholder="Item"
             value={item}
             onChange={(e) => setItem(e.target.value)}
             required
           />
-        </div>
-        <div>
-          <label>Merchant: </label>
+
           <input
+            className="border border-gray-300 px-3 py-2 rounded-md"
+            placeholder="Merchant (optional)"
             value={merchant}
             onChange={(e) => setMerchant(e.target.value)}
           />
-        </div>
-        <div>
-          <label>Notes: </label>
-          <input value={notes} onChange={(e) => setNotes(e.target.value)} />
-        </div>
-        <div>
-          <label>Date: </label>
+
+          <input
+            className="border border-gray-300 px-3 py-2 rounded-md"
+            placeholder="Notes (optional)"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          />
+
           <input
             type="date"
+            className="border border-gray-300 px-3 py-2 rounded-md w-full"
             value={date}
             onChange={(e) => setDate(e.target.value)}
           />
+
+          <button
+            type="submit"
+            className="bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition"
+          >
+            Add Expense
+          </button>
+        </form>
+      </div>
+
+      {/* Right side */}
+      <div className="md:col-span-2 bg-white border border-gray-200 rounded-lg p-4 shadow-sm h-[600px] overflow-y-auto">
+        <h2 className="text-xl font-semibold mb-3">Your Expenses</h2>
+
+        <div className="flex flex-col gap-2">
+          {expenses.map((exp) => (
+            <div
+              key={exp._id}
+              className="border border-gray-200 p-3 rounded-md hover:bg-gray-50 transition"
+            >
+              <div className="flex justify-between items-center">
+                <p className="text-xl font-bold text-gray-900">₹{exp.amount}</p>
+
+                <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 border text-[11px]">
+                  {exp.category}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center mt-1">
+                <div className="flex flex-col">
+                  <p className="text-sm font-medium text-gray-900">
+                    {exp.item}
+                  </p>
+                  {exp.merchant && (
+                    <p className="text-xs text-gray-500">via {exp.merchant}</p>
+                  )}
+                </div>
+
+                <span className="text-xs text-gray-500">
+                  {exp.date?.slice(0, 10)}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-start mt-2">
+                <div className="text-[11px] text-gray-500 max-w-[70%]">
+                  {exp.notes && <p>Note: {exp.notes}</p>}
+                </div>
+
+                <div className="flex gap-3 text-sm">
+                  <button
+                    onClick={() => startEdit(exp)}
+                    className="text-blue-600 hover:underline"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(exp._id)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+
+              {/* Edit form */}
+              {editId === exp._id && (
+                <form
+                  onSubmit={handleUpdate}
+                  className="mt-2 flex flex-col gap-2 border-t pt-2"
+                >
+                  <input
+                    className="border border-gray-300 px-2 py-1 rounded"
+                    value={editAmount}
+                    onChange={(e) => setEditAmount(e.target.value)}
+                  />
+                  <input
+                    className="border border-gray-300 px-2 py-1 rounded"
+                    value={editItem}
+                    onChange={(e) => setEditItem(e.target.value)}
+                  />
+                  <input
+                    className="border border-gray-300 px-2 py-1 rounded"
+                    value={editMerchant}
+                    onChange={(e) => setEditMerchant(e.target.value)}
+                  />
+                  <input
+                    className="border border-gray-300 px-2 py-1 rounded"
+                    value={editNotes}
+                    onChange={(e) => setEditNotes(e.target.value)}
+                  />
+
+                  <button
+                    type="submit"
+                    className="bg-indigo-600 text-white py-1 rounded text-sm hover:bg-indigo-700 transition"
+                  >
+                    Save
+                  </button>
+                </form>
+              )}
+            </div>
+          ))}
         </div>
-        <button type="submit">Add Expense</button>
-      </form>
-
-      <hr />
-
-      <h2>Your Expenses</h2>
-      {expenses.map((exp) => (
-        <div key={exp._id} style={{ marginBottom: "15px" }}>
-          <p>Amount: {String(exp.amount)}</p>
-          <p>Item: {exp.item}</p>
-          <p>Merchant: {exp.merchant}</p>
-          <p>Notes: {exp.notes}</p>
-          <p>Date: {exp.date?.slice(0, 10)}</p>
-          <p>Category: {exp.category}</p>
-          <button onClick={() => handleDelete(exp._id)}>Delete</button>
-          <button onClick={() => startEdit(exp)}>Edit</button>
-
-          {editId === exp._id && (
-            <form onSubmit={handleUpdate}>
-              <label>Amount: </label>
-              <input
-                value={editAmount}
-                onChange={(e) => setEditAmount(e.target.value)}
-              />
-
-              <label>Item: </label>
-              <input
-                value={editItem}
-                onChange={(e) => setEditItem(e.target.value)}
-              />
-
-              <label>Merchant: </label>
-              <input
-                value={editMerchant}
-                onChange={(e) => setEditMerchant(e.target.value)}
-              />
-
-              <label>Notes: </label>
-              <input
-                value={editNotes}
-                onChange={(e) => setEditNotes(e.target.value)}
-              />
-
-              <button type="submit">Save</button>
-            </form>
-          )}
-        </div>
-      ))}
+      </div>
     </div>
   );
 }

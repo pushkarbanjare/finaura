@@ -2,13 +2,13 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { User } from "@/models/User";
 import { Expense } from "@/models/Expense";
-import { getUserIdFromRequest } from "@/lib/auth";
+import { getUserIdFromSession } from "@/lib/auth/session";
 
 export async function GET(req: Request) {
   try {
     await connectDB();
 
-    const userId = getUserIdFromRequest(req);
+    const userId = await getUserIdFromSession();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -18,39 +18,32 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Read month, year from URL
+    // Read month & year from query params
     const { searchParams } = new URL(req.url);
 
-    const monthParam = searchParams.get("month");
-    const yearParam = searchParams.get("year");
-
     const now = new Date();
-    const month = monthParam ? Number(monthParam) : now.getMonth();
-    const year = yearParam ? Number(yearParam) : now.getFullYear();
+    const month = Number(searchParams.get("month") ?? now.getMonth());
+    const year = Number(searchParams.get("year") ?? now.getFullYear());
 
-    // Calculate month boundaries
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
 
-    const salary = user.salary || 0;
+    const salary = user.salary ?? 0;
 
     const expenses = await Expense.find({
       userId,
       date: { $gte: firstDay, $lte: lastDay },
     });
 
-    const totalSpend = expenses.reduce((sum, e) => sum + e.amount, 0);
+    const totalSpend = expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
-    // Category Total
     const categoryTotals: Record<string, number> = {};
+    const dailySpend: Record<string, number> = {};
+
     expenses.forEach((exp) => {
       categoryTotals[exp.category] =
         (categoryTotals[exp.category] || 0) + exp.amount;
-    });
 
-    // Expense Data
-    const dailySpend: Record<string, number> = {};
-    expenses.forEach((exp) => {
       const day = new Date(exp.date).getDate();
       dailySpend[day] = (dailySpend[day] || 0) + exp.amount;
     });
@@ -68,7 +61,7 @@ export async function GET(req: Request) {
         categoryTotals,
         dailySpend,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("DASHBOARD SUMMARY ERROR:", error);

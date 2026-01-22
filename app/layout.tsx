@@ -1,28 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Outfit } from "next/font/google";
+import { Inter, DM_Sans } from "next/font/google";
 import "./globals.css";
 
-import Navbar from "@/components/Navbar";
-import ToastProvider from "@/components/ToastProvider";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const dmSans = DM_Sans({
   subsets: ["latin"],
-});
-
-const outfit = Outfit({
-  subsets: ["latin"],
-  variable: "--font-outfit",
+  variable: "--font-dm-sans",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "Finaura",
-  description: "Finance Intelligence App",
+  description: "Personal Finance & Expense Intelligence App",
 };
 
 export default function RootLayout({
@@ -31,15 +25,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} antialiased`}
-      >
-        <ToastProvider>
-          <Navbar />
-          <div className="p-5">{children}</div>
-        </ToastProvider>
-      </body>
+    <html lang="en" className={`${inter.variable} ${dmSans.variable}`}>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   );
 }

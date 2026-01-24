@@ -1,32 +1,29 @@
 import { cookies } from "next/headers";
 import DashboardClient from "./DashboardClient";
 
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ month?: string; year?: string }>;
-}) {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore.toString();
+const BASE_URL =
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.NODE_ENV === "production"
+    ? "https://finaura-app.vercel.app"
+    : "http://localhost:3000");
 
-  const params = await searchParams;
+export default async function DashboardPage() {
+  const cookieHeader = (await cookies()).toString();
 
-  const month = Number(params.month ?? new Date().getMonth());
-  const year = Number(params.year ?? new Date().getFullYear());
+  const now = new Date();
+  const month = now.getMonth();
+  const year = now.getFullYear();
 
   const [profileRes, summaryRes, insightsRes] = await Promise.all([
-    fetch("http://localhost:3000/api/profile/get", {
+    fetch(`${BASE_URL}/api/profile/get`, {
       headers: { cookie: cookieHeader },
       cache: "no-store",
     }),
-    fetch(
-      `http://localhost:3000/api/dashboard/summary?month=${month}&year=${year}`,
-      {
-        headers: { cookie: cookieHeader },
-        cache: "no-store",
-      }
-    ),
-    fetch("http://localhost:3000/api/dashboard/insights", {
+    fetch(`${BASE_URL}/api/dashboard/summary?month=${month}&year=${year}`, {
+      headers: { cookie: cookieHeader },
+      cache: "no-store",
+    }),
+    fetch(`${BASE_URL}/api/dashboard/insights`, {
       headers: { cookie: cookieHeader },
       cache: "no-store",
     }),
@@ -43,10 +40,10 @@ export default async function DashboardPage({
       userName={profile.name ?? ""}
       goalAmount={profile.goalAmount ?? null}
       goalYear={profile.goalYear ?? null}
-      summary={summary}
-      insights={insights.insights ?? []}
-      month={month}
-      year={year}
+      initialMonth={month}
+      initialYear={year}
+      initialSummary={summary}
+      initialInsights={insights.insights ?? []}
     />
   );
 }

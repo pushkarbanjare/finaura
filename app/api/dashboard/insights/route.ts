@@ -43,7 +43,7 @@ export async function GET() {
 
     const insights: string[] = [];
 
-    // -------- Spending trend --------
+    // SPENDING TREND
     if (lastMonthSpend > 0) {
       const change = ((thisMonthSpend - lastMonthSpend) / lastMonthSpend) * 100;
 
@@ -62,7 +62,7 @@ export async function GET() {
       }
     }
 
-    // -------- Category overshoot --------
+    // CATEGORY
     const categoryTotals: Record<string, number> = {};
     thisMonthExpenses.forEach((exp) => {
       categoryTotals[exp.category] =
@@ -79,7 +79,7 @@ export async function GET() {
       }
     }
 
-    // -------- Savings insight --------
+    // SAVING INSIGHT
     const savings = salary - thisMonthSpend;
     if (savings >= 0) {
       insights.push(`You saved ₹${savings} this month. Good job!`);
@@ -87,7 +87,7 @@ export async function GET() {
       insights.push(`You overspent this month by ₹${Math.abs(savings)}.`);
     }
 
-    // -------- Goal insight --------
+    // GOAL INSIGHT
     if (goalAmount > 0 && goalYear > now.getFullYear()) {
       const yearsLeft = goalYear - now.getFullYear();
       const requiredMonthly = Math.round(goalAmount / (yearsLeft * 12));

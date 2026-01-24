@@ -9,12 +9,16 @@ export default function AuthForm() {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (loading) return;
+
     setLoading(true);
+    setError(null);
 
     const url = mode === "login" ? "/api/auth/login" : "/api/auth/signup";
 
@@ -29,17 +33,19 @@ export default function AuthForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        console.error(data.error || "Something went wrong");
+        setError(data.error || "Something went wrong");
         return;
       }
 
       if (mode === "login") {
-        // router.replace("/dashboard");
-        // router.refresh();
-        window.location.href = "/dashboard";
+        router.replace("/dashboard");
+        router.refresh();
       } else {
         setMode("login");
+        setError("Signup successful. Please login.");
       }
+    } catch {
+      setError("Network error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -47,9 +53,15 @@ export default function AuthForm() {
 
   return (
     <div className="w-full max-w-sm rounded-lg border border-foreground/20 bg-background p-6">
-      <h1 className="font-heading text-2xl text-center mb-6">
+      <h1 className="font-heading text-2xl text-center mb-6 font-semibold">
         {mode === "login" ? "Login to Finaura" : "Create Your Account"}
       </h1>
+
+      {error && (
+        <div className="mb-4 rounded-md bg-red-500/10 text-red-600 px-3 py-2 text-sm">
+          {error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
@@ -79,17 +91,20 @@ export default function AuthForm() {
         <button
           disabled={loading}
           type="submit"
-          className="mt-2 rounded-md border border-foreground/30 py-2 text-sm hover:bg-foreground/5 transition disabled:opacity-50"
+          className="mt-2 rounded-md border border-foreground/20 py-2 text-sm hover:bg-foreground/20 transition disabled:opacity-50"
         >
           {loading ? "Please wait..." : mode === "login" ? "Login" : "Signup"}
         </button>
       </form>
 
       <button
-        onClick={() => setMode(mode === "login" ? "signup" : "login")}
+        onClick={() => {
+          setMode(mode === "login" ? "signup" : "login");
+          setError(null);
+        }}
         className="mt-4 w-full text-center text-sm text-foreground/70 hover:text-foreground transition"
       >
-        Switch to {mode === "login" ? "Signup" : "Login"}
+        Switch to {mode === "login" ? "SIGNUP" : "LOGIN"}
       </button>
     </div>
   );

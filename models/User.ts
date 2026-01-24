@@ -9,7 +9,7 @@ const UserSchema = new Schema(
     goalAmount: { type: Number, default: 0 },
     goalYear: { type: Number, default: 0 },
   },
-  { timestamps: false }
+  { timestamps: false },
 );
 
 export const User = models.User || model("User", UserSchema);

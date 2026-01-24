@@ -8,9 +8,9 @@ const ExpenseSchema = new Schema(
     merchant: { type: String, default: "" },
     notes: { type: String, default: "" },
     date: { type: Date, default: Date.now() },
-    category: { type: String, default: "Uncategorized" }, // AI generated
+    category: { type: String, default: "Uncategorized" },
   },
-  { timestamps: false }
+  { timestamps: false },
 );
 
 export const Expense = models.Expense || model("Expense", ExpenseSchema);

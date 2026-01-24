@@ -18,7 +18,6 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Read month & year from query params
     const { searchParams } = new URL(req.url);
 
     const now = new Date();

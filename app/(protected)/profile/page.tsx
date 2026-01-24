@@ -11,7 +11,7 @@ export default async function ProfilePage() {
 
   const res = await fetch(`${baseUrl}/api/profile/get`, {
     headers: {
-      cookie: cookieStore.toString(), // ✅ THIS WAS MISSING
+      cookie: cookieStore.toString(),
     },
     cache: "no-store",
   });

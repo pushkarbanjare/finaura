@@ -1,17 +1,23 @@
 "use client";
 
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  Label,
+} from "recharts";
 
 const COLORS = [
-  "#6366F1",
-  "#F59E0B",
-  "#10B981",
-  "#EF4444",
-  "#3B82F6",
-  "#8B5CF6",
-  "#EC4899",
-  "#14B8A6",
-  "#F97316",
+  "#818cf8",
+  "#22d3ee",
+  "#34d399",
+  "#fbbf24",
+  "#fb7185",
+  "#a78bfa",
+  "#60a5fa",
+  "#2dd4bf",
 ];
 
 export default function CategoryPieChart({ categoryTotals }: any) {
@@ -20,38 +26,70 @@ export default function CategoryPieChart({ categoryTotals }: any) {
     value: Number(value),
   }));
 
+  if (!data.length) return null;
+
+  const total = data.reduce((sum, d) => sum + d.value, 0);
+
   return (
-    <div className="w-full fade-in">
-      <div className="h-80">
+    <div className="flex flex-col items-center w-full">
+      <div className="w-52 h-52 sm:w-56 sm:h-56">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={data}
               dataKey="value"
-              innerRadius={70}
-              outerRadius={110}
-              paddingAngle={4}
-              animationDuration={900}
+              innerRadius="58%"
+              outerRadius="78%"
+              paddingAngle={3}
+              isAnimationActive
             >
+              <Label
+                value={`₹${total}`}
+                position="center"
+                className="fill-foreground text-lg font-semibold"
+              />
+
               {data.map((_, i) => (
-                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                <Cell
+                  key={i}
+                  fill={COLORS[i % COLORS.length]}
+                  stroke="#020617"
+                  strokeWidth={2}
+                />
               ))}
             </Pie>
 
-            <Tooltip />
+            <Tooltip
+              cursor={{ fill: "rgba(99,102,241,0.1)" }}
+              contentStyle={{
+                backgroundColor: "#020617",
+                border: "1px solid #334155",
+                fontSize: "12px",
+              }}
+              labelStyle={{
+                color: "#e5e7eb",
+                fontWeight: 500,
+              }}
+              itemStyle={{
+                color: "#ffffff",
+              }}
+              formatter={(value: number, name: string) => [`₹${value}`, name]}
+            />
           </PieChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm w-full">
         {data.map((entry, index) => (
-          <div key={index} className="flex items-center gap-2">
-            <div
-              className="w-3 h-3 rounded-full"
+          <div
+            key={index}
+            className="flex items-center gap-2 text-foreground/80"
+          >
+            <span
+              className="h-3 w-3 rounded-full"
               style={{ backgroundColor: COLORS[index % COLORS.length] }}
-            ></div>
-
-            <span>
+            />
+            <span className="truncate">
               {entry.name}: ₹{entry.value}
             </span>
           </div>

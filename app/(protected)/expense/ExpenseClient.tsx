@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type Expense = {
   _id: string;
@@ -26,6 +26,10 @@ export default function ExpenseClient({
   const [notes, setNotes] = useState("");
   const [date, setDate] = useState("");
 
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
   // edit state
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({
@@ -36,6 +40,17 @@ export default function ExpenseClient({
     date: "",
   });
 
+  useEffect(() => {
+    if (!message && !error) return;
+
+    const timer = setTimeout(() => {
+      setMessage(null);
+      setError(null);
+    }, 3000); // 3 seconds
+
+    return () => clearTimeout(timer);
+  }, [message, error]);
+
   async function reload() {
     const res = await fetch("/api/expense/list");
     const data = await res.json();
@@ -45,25 +60,54 @@ export default function ExpenseClient({
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
 
-    const res = await fetch("/api/expense/add", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amount: Number(amount),
-        item,
-        merchant: merchant || undefined,
-        notes: notes || undefined,
-        date: date || undefined,
-      }),
-    });
+    // reset messages
+    setError(null);
+    setMessage(null);
 
-    if (res.ok) {
+    if (!amount || Number(amount) <= 0) {
+      setError("Please enter a valid amount");
+      return;
+    }
+
+    if (!item.trim()) {
+      setError("Please enter an item name");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const res = await fetch("/api/expense/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: Number(amount),
+          item: item.trim(),
+          merchant: merchant || undefined,
+          notes: notes || undefined,
+          date: date || undefined,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to add expense");
+        return;
+      }
+
       setAmount("");
       setItem("");
       setMerchant("");
       setNotes("");
       setDate("");
+
+      setMessage("Expense added successfully");
       reload();
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -93,7 +137,7 @@ export default function ExpenseClient({
 
     const payload: any = { expenseId: editingId };
 
-    if (editForm.amount !== "") payload.amount = Number(editForm.amount);
+    if (editForm.amount) payload.amount = Number(editForm.amount);
     if (editForm.item.trim()) payload.item = editForm.item.trim();
     if (editForm.merchant.trim()) payload.merchant = editForm.merchant.trim();
     if (editForm.notes.trim()) payload.notes = editForm.notes.trim();
@@ -112,130 +156,167 @@ export default function ExpenseClient({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {/* Add Expense */}
-      <div className="rounded-lg border border-foreground/20 p-4">
-        <h2 className="font-semibold mb-3">Add Expense</h2>
+    <div className="mx-auto max-w-6xl px-4 pb-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-5">
+        {/* ADD EXPENSE FORM */}
+        <div className="rounded-xl border border-foreground/20 bg-background p-5">
+          <h2 className="text-lg font-semibold mb-4">Add Expense</h2>
 
-        <form onSubmit={handleAdd} className="flex flex-col gap-4">
-          <input
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="Amount"
-            className="bg-gray-800 rounded-lg p-2 text-sm"
-          />
-          <input
-            value={item}
-            onChange={(e) => setItem(e.target.value)}
-            placeholder="Item"
-            className="bg-gray-800 rounded-lg p-2 text-sm"
-          />
-          <input
-            value={merchant}
-            onChange={(e) => setMerchant(e.target.value)}
-            placeholder="Merchant"
-            className="bg-gray-800 rounded-lg p-2 text-sm"
-          />
-          <input
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Notes"
-            className="bg-gray-800 rounded-lg p-2 text-sm"
-          />
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="bg-gray-800 rounded-lg p-2 text-sm cursor-pointer"
-          />
+          {message && (
+            <p className="rounded-md bg-green-900/30 text-green-400 px-3 py-2 text-sm">
+              {message}
+            </p>
+          )}
 
-          <button className="border border-foreground/50 rounded-lg text-sm p-2 hover:bg-foreground/20">
-            Add Expense
-          </button>
-        </form>
-      </div>
-
-      {/* Expense List */}
-      <div className="md:col-span-2 space-y-2">
-        {expenses.map((exp) => (
-          <div
-            key={exp._id}
-            className="border border-foreground/40 p-3 rounded-md px-5"
-          >
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="font-medium">
-                  ₹{exp.amount} — {exp.item}
-                </p>
-                <p className="text-xs text-foreground/60">{exp.category}</p>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => startEdit(exp)}
-                  className="text-sm bg-blue-700 rounded-sm px-2 py-1 hover:bg-blue-900 cursor-pointer"
-                >
-                  Edit
-                </button>
-
-                <button
-                  onClick={() => handleDelete(exp._id)}
-                  className="text-sm bg-red-700 rounded-sm px-2 py-1 hover:bg-red-900 cursor-pointer"
-                >
-                  Delete
-                </button>
-              </div>
+          {error && (
+            <div className="rounded-md bg-red-900/30 text-red-400 px-3 py-2 text-sm">
+              {error}
             </div>
+          )}
 
-            {/* Edit form */}
-            {editingId === exp._id && (
-              <form
-                onSubmit={handleUpdate}
-                className="mt-3 flex flex-col gap-2 border-t pt-3"
-              >
-                <input
-                  value={editForm.amount}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, amount: e.target.value })
-                  }
-                  placeholder="Amount"
-                />
-                <input
-                  value={editForm.item}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, item: e.target.value })
-                  }
-                  placeholder="Item"
-                />
-                <input
-                  value={editForm.merchant}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, merchant: e.target.value })
-                  }
-                  placeholder="Merchant"
-                />
-                <input
-                  value={editForm.notes}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, notes: e.target.value })
-                  }
-                  placeholder="Notes"
-                />
-                <input
-                  type="date"
-                  value={editForm.date}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, date: e.target.value })
-                  }
-                />
+          <form
+            onSubmit={handleAdd}
+            className="flex flex-col gap-3 text-sm pt-3"
+          >
+            <input
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="Amount"
+              className="rounded-md border border-foreground/20 bg-background px-3 py-2 outline-none focus:border-foreground/40"
+            />
+            <input
+              value={item}
+              onChange={(e) => setItem(e.target.value)}
+              placeholder="Item"
+              className="rounded-md border border-foreground/20 bg-background px-3 py-2 outline-none focus:border-foreground/40"
+            />
+            <input
+              value={merchant}
+              onChange={(e) => setMerchant(e.target.value)}
+              placeholder="Merchant (optional)"
+              className="rounded-md border border-foreground/20 bg-background px-3 py-2 outline-none focus:border-foreground/40"
+            />
+            <input
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Notes (optional)"
+              className="rounded-md border border-foreground/20 bg-background px-3 py-2 outline-none focus:border-foreground/40"
+            />
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="rounded-md border border-foreground/20 bg-background px-3 py-2 outline-none focus:border-foreground/40"
+            />
 
-                <button className="border rounded-md py-1 hover:bg-foreground/20">
-                  Save Changes
-                </button>
-              </form>
+            <button
+              disabled={loading}
+              className="border border-foreground/50 rounded-lg text-sm p-2 hover:bg-foreground/20 disabled:opacity-50"
+            >
+              {loading ? "Adding..." : "Add Expense"}
+            </button>
+          </form>
+        </div>
+
+        {/* EXPENSE LIST */}
+        <div className="md:col-span-2 rounded-xl border border-foreground/20 bg-background p-5 flex flex-col">
+          <h2 className="text-lg font-semibold mb-4">Your Expenses</h2>
+
+          <div className="flex-1 max-h-[520px] overflow-y-auto pr-2 space-y-3">
+            {expenses.length === 0 ? (
+              <div className="flex h-full items-center justify-center text-sm text-foreground/50 text-center px-6">
+                No expenses found yet. <br />
+                Add your first expense to see it here.
+              </div>
+            ) : (
+              expenses.map((exp) => (
+                <div
+                  key={exp._id}
+                  className="rounded-lg border border-foreground/15 p-4"
+                >
+                  <div className="flex justify-between items-start gap-4">
+                    <div>
+                      <p className="text-base font-medium">
+                        ₹{exp.amount} · {exp.item}
+                      </p>
+                      <p className="text-xs text-foreground/60 mt-1">
+                        {exp.category}
+                        {exp.date && ` · ${exp.date.slice(0, 10)}`}
+                      </p>
+                    </div>
+
+                    <div className="flex gap-2 text-xs">
+                      <button
+                        onClick={() => startEdit(exp)}
+                        className="rounded-md border border-foreground/20 px-2 py-1 hover:bg-foreground/10"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(exp._id)}
+                        className="rounded-md border border-red-500/30 px-2 py-1 text-red-400 hover:bg-red-500/10"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+
+                  {editingId === exp._id && (
+                    <form
+                      onSubmit={handleUpdate}
+                      className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm"
+                    >
+                      <input
+                        value={editForm.amount}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, amount: e.target.value })
+                        }
+                        placeholder="Amount"
+                        className="rounded-md border border-foreground/20 bg-background px-2 py-1"
+                      />
+                      <input
+                        value={editForm.item}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, item: e.target.value })
+                        }
+                        placeholder="Item"
+                        className="rounded-md border border-foreground/20 bg-background px-2 py-1"
+                      />
+                      <input
+                        value={editForm.merchant}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, merchant: e.target.value })
+                        }
+                        placeholder="Merchant"
+                        className="rounded-md border border-foreground/20 bg-background px-2 py-1"
+                      />
+                      <input
+                        value={editForm.notes}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, notes: e.target.value })
+                        }
+                        placeholder="Notes"
+                        className="rounded-md border border-foreground/20 bg-background px-2 py-1"
+                      />
+                      <input
+                        type="date"
+                        value={editForm.date}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, date: e.target.value })
+                        }
+                        className="rounded-md border border-foreground/20 bg-background px-2 py-1"
+                      />
+
+                      <button className="sm:col-span-2 mt-1 rounded-md border border-foreground/30 py-1 hover:bg-foreground/10">
+                        Save Changes
+                      </button>
+                    </form>
+                  )}
+                </div>
+              ))
             )}
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );

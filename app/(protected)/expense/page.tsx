@@ -11,7 +11,7 @@ export default async function ExpensePage() {
 
   const res = await fetch(`${baseUrl}/api/expense/list`, {
     headers: {
-      cookie: cookieStore.toString(), // ✅ THIS WAS MISSING
+      cookie: cookieStore.toString(),
     },
     cache: "no-store",
   });

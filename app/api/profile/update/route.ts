@@ -59,15 +59,14 @@ export async function PUT(req: Request) {
       { status: 200 },
     );
   } catch (error: unknown) {
-  if (error instanceof ZodError) {
-    return NextResponse.json(
-      { error: error.issues[0]?.message ?? "Invalid input" },
-      { status: 400 },
-    );
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        { error: error.issues[0]?.message ?? "Invalid input" },
+        { status: 400 },
+      );
+    }
+
+    console.error("PROFILE UPDATE ERROR:", error);
+    return NextResponse.json({ error: "Server Error" }, { status: 500 });
   }
-
-  console.error("PROFILE UPDATE ERROR:", error);
-  return NextResponse.json({ error: "Server Error" }, { status: 500 });
-}
-
 }

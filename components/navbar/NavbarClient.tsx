@@ -47,7 +47,7 @@ export default function NavbarClient({ navItems }: { navItems: NavItem[] }) {
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className={`text-sm ${
+                className={`text-sm hover:text-foreground ${
                   pathname === item.href
                     ? "font-medium text-foreground"
                     : "text-foreground/70"
@@ -59,7 +59,7 @@ export default function NavbarClient({ navItems }: { navItems: NavItem[] }) {
 
             <button
               onClick={handleLogout}
-              className="rounded-md border border-foreground/20 py-2 text-sm hover:bg-foreground/5 transition"
+              className="rounded-md border border-foreground/20 py-2 text-sm hover:bg-foreground/20 transition"
             >
               Logout
             </button>

@@ -1,7 +1,7 @@
 export function generateCategory(
   item: string,
   merchant: string,
-  notes: string
+  notes: string,
 ) {
   const text = `${item} ${merchant} ${notes}`.toLowerCase();
 
@@ -79,7 +79,8 @@ export function generateCategory(
     text.includes("wifi") ||
     text.includes("broadband") ||
     text.includes("waterbill") ||
-    text.includes("gas")
+    text.includes("gas") ||
+    text.includes("bills")
   ) {
     return "Bills";
   }

@@ -1,4 +1,4 @@
-# Finaura — Personal Finance & Expense Intelligence App
+# Finaura — Personal Finance Management Platform
 Finaura is a full-stack personal finance application built with Next.js App Router, focusing on secure authentication, real-world backend practices, and clean analytics-driven UI.
 It allows users to track expenses, analyze monthly spending patterns, and manage financial goals in a secure, multi-user environment.
 

@@ -23,6 +23,7 @@ export async function GET() {
         salary: user.salary ?? 0,
         goalAmount: user.goalAmount ?? 0,
         goalYear: user.goalYear ?? 0,
+        email: user.email,
       },
       { status: 200 },
     );

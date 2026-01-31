@@ -34,16 +34,26 @@ export default async function DashboardPage() {
   const profile = await profileRes.json();
   const summary = await summaryRes.json();
   const insights = await insightsRes.json();
+  const isDemoUser = profile.email === "test@mail.com";
 
   return (
-    <DashboardClient
-      userName={profile.name ?? ""}
-      goalAmount={profile.goalAmount ?? null}
-      goalYear={profile.goalYear ?? null}
-      initialMonth={month}
-      initialYear={year}
-      initialSummary={summary}
-      initialInsights={insights.insights ?? []}
-    />
+    <>
+      {isDemoUser && (
+        <div className="mx-auto max-w-6xl px-4 pt-4 text-center text-sm text-foreground/60">
+          Please check <strong>December 2025</strong> and{" "}
+          <strong>January 2026</strong> for analytics.
+        </div>
+      )}
+
+      <DashboardClient
+        userName={profile.name ?? ""}
+        goalAmount={profile.goalAmount ?? null}
+        goalYear={profile.goalYear ?? null}
+        initialMonth={month}
+        initialYear={year}
+        initialSummary={summary}
+        initialInsights={insights.insights ?? []}
+      />
+    </>
   );
 }

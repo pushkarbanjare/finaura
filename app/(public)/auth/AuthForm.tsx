@@ -17,8 +17,12 @@ export default function AuthForm() {
     e.preventDefault();
     if (loading) return;
 
-    setLoading(true);
     setError(null);
+    if (mode === "signup" && password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+    setLoading(true);
 
     const url = mode === "login" ? "/api/auth/login" : "/api/auth/signup";
 
@@ -96,6 +100,19 @@ export default function AuthForm() {
           {loading ? "Please wait..." : mode === "login" ? "Login" : "Signup"}
         </button>
       </form>
+
+      <button
+        type="button"
+        onClick={() => {
+          setEmail("test@mail.com");
+          setPassword("123456");
+          setMode("login");
+          setError(null);
+        }}
+        className="mt-3 w-full rounded-md border border-dashed border-foreground/30 py-2 text-sm text-foreground/70 hover:bg-foreground/80 hover:text-background transition"
+      >
+        Login as Demo User
+      </button>
 
       <button
         onClick={() => {

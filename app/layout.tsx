@@ -16,7 +16,7 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: "Finaura",
-  description: "Personal Finance & Expense Intelligence App",
+  description: "Personal Finance Management System",
 };
 
 export default function RootLayout({

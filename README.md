@@ -1,6 +1,6 @@
 # FinAura
 
-FinAura is a Personal Finance Management Platform designed to help users track expenses, analyze spending patterns, and monitor financial goals through real-time analytics and automated categorization.The platform combines secure authentication, structured data processing, and interactive financial visualizations to deliver actionable insights into user spending behaviour.
+FinAura is a Personal Finance Management Platform designed to help users track their expenses, analyze spending patterns, and monitor financial goals through real-time analytics and automated categorization.The platform combines secure authentication, structured data processing, and interactive financial visualizations to deliver actionable insights into user spending behaviour.
 
 **Live at: https://finaura-app.vercel.app/**
 

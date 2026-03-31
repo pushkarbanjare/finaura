@@ -7,6 +7,7 @@ FinAura is a Personal Finance Management Platform designed to help users track t
 ## PROBLEM STATEMENT
 
 Most individuals track expenses manually or not at all. Traditional tracking methods:
+
 - Provide limited financial insights
 - Fail to visualize spending behaviour
 - Do not connect expenses with savings goals
@@ -16,6 +17,7 @@ This results in poor financial awareness and weak decision-making.
 ## SOLUTION
 
 FinAura provides an integrated expense intelligence platform that:
+
 - Records and categorizes expenses
 - Calculates savings and financial summaries
 - Generates monthly analytics dashboards
@@ -23,24 +25,26 @@ FinAura provides an integrated expense intelligence platform that:
 - Tracks progress toward savings goals
 
 ## ARCHITECTURE
+
 1. **Frontend**
-    - Next.js App Router
-    - React client components
-    - Interactive financial charts (Recharts)
-    - Responsive dashboard UI
+   - Next.js App Router
+   - React client components
+   - Interactive financial charts (Recharts)
+   - Responsive dashboard UI
 2. **Backend**
-    - Next.js API routes (REST architecture)
-    - JWT session-based authentication
-    - MongoDB database
-    - Zod schema validation
-    - Rate limiting middleware
+   - Next.js API routes (REST architecture)
+   - JWT session-based authentication
+   - MongoDB database
+   - Zod schema validation
+   - Rate limiting middleware
 3. **Security Layer**
-    - Bcrypt password hashing
-    - HTTP-only session cookies
-    - Request rate limiting
-    - Input validation schemas
+   - Bcrypt password hashing
+   - HTTP-only session cookies
+   - Request rate limiting
+   - Input validation schemas
 
 ## FEATURES
+
 - **Secure Authentication:** JWT session management with Bcrypt password hashing and HTTP-only cookies.
 - **Expense Intelligence:** Automated categorization engine with support for metadata and notes.
 - **Financial Analytics:** Dynamic dashboards using Recharts for category distribution and trend analysis.
@@ -48,16 +52,19 @@ FinAura provides an integrated expense intelligence platform that:
 - **Data Integrity:** Strict server-side validation using Zod schemas and API rate limiting.
 
 ## API MODULE
+
 1. **Authentication**: signup, login, logout
 2. **Expense Management**: add, update, delete, list expenses
 3. **Financial Analytics**: monthly summary, spending insights
 4. **User Profile**: fetch profile, update profile
 
 ## DATABASE MODEL
+
 1. **User**: Name, Email, Password, Salary, Savings Goals.
 2. **Expense**: Amount, Item, Merchant, Category, Date, User Reference
 
 ## DATA PROCESSING FLOW
+
 1. User records expense
 2. Input validated via schema
 3. Category auto-generated
@@ -67,14 +74,15 @@ FinAura provides an integrated expense intelligence platform that:
 7. Visual charts rendered
 
 ## TECH STACK
+
 - **Frontend**: Next.js, Tailwind CSS, Recharts
 - **Backend**: Next.js API Routes (Node.js)
 - **Database**: MongoDB with Mongoose ODM
 - **Security**: Zod (Schemas-based validation)
 
 ## FUTURE IMPROVEMENTS
+
 - AI-based spending predictions
-- Bank API integration
 - Recurring expense detection
 - Anomaly detection in spending
 - Exportable financial reports

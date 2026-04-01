@@ -88,7 +88,7 @@ export default function DashboardClient({
         </p>
       ) : (
         <>
-          {/* SECTION 1 — Charts */}
+        {/* charts */}
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="min-h-80 lg:h-80 flex-1 rounded-lg border border-foreground/20 p-4">
               <CategoryPieChart categoryTotals={summary.categoryTotals} />
@@ -103,7 +103,7 @@ export default function DashboardClient({
             </div>
           </div>
 
-          {/* SECTION 2 — Summary & Insights */}
+          {/* summary & insights */}
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="flex-1 rounded-lg border border-foreground/20 p-4">
               <h2 className="text-lg font-semibold mb-3">Summary</h2>

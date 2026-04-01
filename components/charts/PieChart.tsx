@@ -1,24 +1,8 @@
 "use client";
 
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-  Label,
-} from "recharts";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Label} from "recharts";
 
-const COLORS = [
-  "#818cf8",
-  "#22d3ee",
-  "#34d399",
-  "#fbbf24",
-  "#fb7185",
-  "#a78bfa",
-  "#60a5fa",
-  "#2dd4bf",
-];
+const COLORS = ["#818cf8", "#22d3ee", "#34d399", "#fbbf24", "#fb7185", "#a78bfa", "#60a5fa", "#2dd4bf"];
 
 export default function CategoryPieChart({ categoryTotals }: any) {
   const data = Object.entries(categoryTotals).map(([name, value]) => ({

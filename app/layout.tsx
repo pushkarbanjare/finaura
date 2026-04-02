@@ -15,7 +15,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Finaura",
+  title: "FinAura",
   description: "Personal Finance Management System",
 };
 

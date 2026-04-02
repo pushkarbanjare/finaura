@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import { connectDB } from "@/lib/db";
-import { User } from "@/models/User";
-import { generateToken } from "@/lib/auth/jwt";
 import { rateLimit } from "@/lib/security/rateLimit";
 import { loginSchema } from "@/lib/validators/auth.schema";
+import { loginUser } from "@/services/auth.service";
+import { AppError, RateLimitError } from "@/lib/errors";
 
 export async function POST(req: Request) {
   try {
@@ -14,35 +12,13 @@ export async function POST(req: Request) {
       "unknown";
 
     const allowed = rateLimit(`login:${ip}`, 5, 60_000);
-    if (!allowed) {
-      return NextResponse.json(
-        { error: "Too many login attempts. Try again later." },
-        { status: 429 },
-      );
-    }
+    if (!allowed)
+      throw new RateLimitError("Too many requests, Try again later.");
 
     const body = loginSchema.parse(await req.json());
     const { email, password } = body;
 
-    await connectDB();
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return NextResponse.json(
-        { error: "Invalid email or password" },
-        { status: 400 },
-      );
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return NextResponse.json(
-        { error: "Invalid email or password" },
-        { status: 400 },
-      );
-    }
-
-    const token = generateToken(user._id.toString());
+    const { user, token } = await loginUser(email, password);
 
     const response = NextResponse.json(
       {
@@ -65,14 +41,26 @@ export async function POST(req: Request) {
 
     return response;
   } catch (error: any) {
+    // ========== zod validation ==========
     if (error?.name === "ZodError") {
       return NextResponse.json(
-        { error: error.errors[0].message },
+        { error: error.issues[0].message },
         { status: 400 },
       );
     }
 
+    // ========== custom app errors ==========
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.statusCode },
+      );
+    }
+
     console.error("LOGIN ERROR:", error);
-    return NextResponse.json({ error: "Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

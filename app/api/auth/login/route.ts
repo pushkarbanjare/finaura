@@ -6,18 +6,22 @@ import { AppError, RateLimitError } from "@/lib/errors";
 
 export async function POST(req: Request) {
   try {
+    // ========== client identification ==========
     const ip =
       req.headers.get("x-forwarded-for") ??
       req.headers.get("x-real-ip") ??
       "unknown";
 
+    // ========== rate limit ==========
     const allowed = rateLimit(`login:${ip}`, 5, 60_000);
     if (!allowed)
       throw new RateLimitError("Too many requests, Try again later.");
 
+    // ========== request parsing ==========
     const body = loginSchema.parse(await req.json());
     const { email, password } = body;
 
+    // ========== auth logic ==========
     const { user, token } = await loginUser(email, password);
 
     const response = NextResponse.json(
@@ -31,6 +35,7 @@ export async function POST(req: Request) {
       { status: 200 },
     );
 
+    // ========== setting cookies ==========
     response.cookies.set("session", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -41,7 +46,7 @@ export async function POST(req: Request) {
 
     return response;
   } catch (error: any) {
-    // ========== zod validation ==========
+    // ========== zod validation errors ==========
     if (error?.name === "ZodError") {
       return NextResponse.json(
         { error: error.issues[0].message },

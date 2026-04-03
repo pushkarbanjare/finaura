@@ -1,47 +1,28 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import { connectDB } from "@/lib/db";
-import { User } from "@/models/User";
-import { generateToken } from "@/lib/auth/jwt";
 import { rateLimit } from "@/lib/security/rateLimit";
 import { signupSchema } from "@/lib/validators/auth.schema";
+import { signupUser } from "@/services/auth.service";
+import { AppError, RateLimitError } from "@/lib/errors";
 
 export async function POST(req: Request) {
   try {
+    // ========== client identification ==========
     const ip =
       req.headers.get("x-forwarded-for") ??
       req.headers.get("x-real-ip") ??
       "unknown";
 
+    // ========== rate limit ==========
     const allowed = rateLimit(`signup:${ip}`, 3, 60_000);
-    if (!allowed) {
-      return NextResponse.json(
-        { error: "Too many signup attempts. Try again later." },
-        { status: 429 },
-      );
-    }
+    if (!allowed)
+      throw new RateLimitError("Too many requests, Try again later.");
 
+    // ========== request parsing ==========
     const body = signupSchema.parse(await req.json());
     const { email, password } = body;
 
-    await connectDB();
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return NextResponse.json(
-        { error: "Email already exists" },
-        { status: 400 },
-      );
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = await User.create({
-      email,
-      password: hashedPassword,
-    });
-
-    const token = generateToken(newUser._id.toString());
+    // ========== auth logic ==========
+    const { user: newUser, token } = await signupUser(email, password);
 
     const response = NextResponse.json(
       {
@@ -54,6 +35,7 @@ export async function POST(req: Request) {
       { status: 201 },
     );
 
+    // ========== setting cookies ==========
     response.cookies.set("session", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -64,14 +46,26 @@ export async function POST(req: Request) {
 
     return response;
   } catch (error: any) {
+    // ========== zod validation errors ==========
     if (error?.name === "ZodError") {
       return NextResponse.json(
-        { error: error.errors[0].message },
+        { error: error.issues[0].message },
         { status: 400 },
       );
     }
 
+    // ========== custom app errors ==========
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.statusCode },
+      );
+    }
+
     console.error("SIGNUP ERROR:", error);
-    return NextResponse.json({ error: "Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

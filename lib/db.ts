@@ -8,8 +8,8 @@ if (!MONGODB_URI) throw new Error("MONGODB_URI is missing");
 let cached = (global as any).mongoose;
 if (!cached) {
   cached = (global as any).mongoose = {
-    conn: null, // stores active connection obj ==========
-    promise: null, // stores connection attempt currently in progress ==========
+    conn: null, // ========== stores active connection obj
+    promise: null, // ========== stores connection attempt currently in progress
   };
 }
 

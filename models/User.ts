@@ -1,5 +1,6 @@
 import { model, models, Schema } from "mongoose";
 
+// ========== schema definition ==========
 const UserSchema = new Schema(
   {
     name: { type: String, default: "" },
@@ -12,4 +13,5 @@ const UserSchema = new Schema(
   { timestamps: false },
 );
 
+// ========== model defintion with serverless fix ==========
 export const User = models.User || model("User", UserSchema);

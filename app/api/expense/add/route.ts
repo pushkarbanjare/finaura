@@ -5,6 +5,8 @@ import { getUserIdFromSession } from "@/lib/auth/session";
 import { generateCategory } from "@/lib/category";
 import { rateLimit } from "@/lib/security/rateLimit";
 import { addExpenseSchema } from "@/lib/validators/expense.schema";
+import { addExpense } from "@/services/expense.service";
+import { AppError } from "@/lib/errors";
 
 export async function POST(req: Request) {
   try {
@@ -29,19 +31,7 @@ export async function POST(req: Request) {
     const body = addExpenseSchema.parse(await req.json());
     const { amount, item, merchant, notes, date } = body;
 
-    await connectDB();
-
-    const category = generateCategory(item, merchant ?? "", notes ?? "");
-
-    const newExpense = await Expense.create({
-      userId,
-      amount,
-      item,
-      merchant,
-      notes,
-      date: date ? new Date(date) : new Date(),
-      category,
-    });
+    const newExpense = await addExpense(userId, body);
 
     return NextResponse.json(
       { message: "Expense added", expense: newExpense },
@@ -50,8 +40,15 @@ export async function POST(req: Request) {
   } catch (error: any) {
     if (error?.name === "ZodError") {
       return NextResponse.json(
-        { error: error.errors[0].message },
+        { error: error.issues[0].message },
         { status: 400 },
+      );
+    }
+
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.statusCode },
       );
     }
 

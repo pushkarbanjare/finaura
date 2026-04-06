@@ -1,34 +1,31 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import { User } from "@/models/User";
 import { getUserIdFromSession } from "@/lib/auth/session";
+import { AppError } from "@/lib/errors";
+import { getProfile } from "@/services/profile.service";
 
 export async function GET() {
   try {
-    await connectDB();
-
+    // ========== auth ==========
     const userId = await getUserIdFromSession();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!userId) throw new AppError("Unauthorized", 401);
+
+    // ========== get profile logic ==========
+    const profile = await getProfile(userId);
+
+    return NextResponse.json(profile, { status: 200 });
+  } catch (error: any) {
+    // ========== custom app errors ==========
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.statusCode },
+      );
     }
 
-    const user = await User.findById(userId).select("-password");
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(
-      {
-        name: user.name ?? "",
-        salary: user.salary ?? 0,
-        goalAmount: user.goalAmount ?? 0,
-        goalYear: user.goalYear ?? 0,
-        email: user.email,
-      },
-      { status: 200 },
-    );
-  } catch (error) {
     console.error("PROFILE GET ERROR:", error);
-    return NextResponse.json({ error: "Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

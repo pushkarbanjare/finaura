@@ -1,72 +1,59 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import { User } from "@/models/User";
 import { getUserIdFromSession } from "@/lib/auth/session";
 import { rateLimit } from "@/lib/security/rateLimit";
 import { updateProfileSchema } from "@/lib/validators/profile.schema";
 import { ZodError } from "zod";
+import { AppError, RateLimitError } from "@/lib/errors";
+import { updateProfile } from "@/services/profile.service";
 
 export async function PUT(req: Request) {
   try {
+    // ========== client identification ==========
     const ip =
       req.headers.get("x-forwarded-for") ??
       req.headers.get("x-real-ip") ??
       "unknown";
 
+    // ========== rate limit ==========
     const allowed = rateLimit(`profile:update:${ip}`, 10, 60_000);
-    if (!allowed) {
-      return NextResponse.json(
-        { error: "Too many profile updates. Try again later." },
-        { status: 429 },
-      );
-    }
+    if (!allowed)
+      throw new RateLimitError("Too many profileupdates, Try again later.");
 
+    // ========== auth ==========
     const userId = await getUserIdFromSession();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!userId) throw new AppError("Unauthorized", 401);
 
+    // ========== request parsing ==========
     const body = updateProfileSchema.parse(await req.json());
-    const { name, salary, goalAmount, goalYear } = body;
 
-    await connectDB();
-
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      {
-        name: name ?? undefined,
-        salary: salary ?? undefined,
-        goalAmount: goalAmount ?? undefined,
-        goalYear: goalYear ?? undefined,
-      },
-      { new: true },
-    ).select("-password");
-
-    if (!updatedUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    // ========== update profile logic ==========
+    const profile = updateProfile(userId, body);
 
     return NextResponse.json(
-      {
-        message: "Profile updated",
-        profile: {
-          name: updatedUser.name ?? "",
-          salary: updatedUser.salary ?? 0,
-          goalAmount: updatedUser.goalAmount ?? 0,
-          goalYear: updatedUser.goalYear ?? 0,
-        },
-      },
+      { message: "Profile updated", profile },
       { status: 200 },
     );
-  } catch (error: unknown) {
+  } catch (error: any) {
+    // ========== zod validation errors ==========
     if (error instanceof ZodError) {
       return NextResponse.json(
-        { error: error.issues[0]?.message ?? "Invalid input" },
+        { error: error.issues[0].message },
         { status: 400 },
       );
     }
 
+    // ========== custom app errors ==========
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.statusCode },
+      );
+    }
+
     console.error("PROFILE UPDATE ERROR:", error);
-    return NextResponse.json({ error: "Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

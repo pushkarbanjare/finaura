@@ -7,8 +7,7 @@ export async function GET(req: Request) {
   try {
     // ========== auth ==========
     const userId = await getUserIdFromSession();
-    if (!userId)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!userId) throw new AppError("Unauthorized", 401);
 
     // ========== query params ==========
     const { searchParams } = new URL(req.url);

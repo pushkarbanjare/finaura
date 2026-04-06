@@ -1,22 +1,31 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import { Expense } from "@/models/Expense";
 import { getUserIdFromSession } from "@/lib/auth/session";
+import { AppError } from "@/lib/errors";
+import { listExpense } from "@/services/expense.service";
 
 export async function GET() {
   try {
-    await connectDB();
-
+    // ========== auth ==========
     const userId = await getUserIdFromSession();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!userId) throw new AppError("Unauthorized", 401);
 
-    const expenses = await Expense.find({ userId }).sort({ date: -1 });
+    // ========== list expense logic ==========
+    const expenses = await listExpense(userId);
 
     return NextResponse.json({ expenses }, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
+    // ========== custom app errors ==========
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.statusCode },
+      );
+    }
+
     console.error("LIST EXPENSE ERROR:", error);
-    return NextResponse.json({ error: "Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

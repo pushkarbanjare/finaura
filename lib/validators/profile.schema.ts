@@ -1,12 +1,10 @@
 import { z } from "zod";
 
+// ========== update profile validation schema ==========
 export const updateProfileSchema = z.object({
   name: z.string().trim().min(1, "Name cannot be empty").optional(),
-
   salary: z.number().nonnegative("Salary must be ≥ 0").optional(),
-
   goalAmount: z.number().nonnegative("Goal amount must be ≥ 0").optional(),
-
   goalYear: z
     .number()
     .int()

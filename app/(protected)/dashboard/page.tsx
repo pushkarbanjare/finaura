@@ -14,27 +14,18 @@ export default async function DashboardPage() {
   const month = now.getMonth();
   const year = now.getFullYear();
 
-  const [profileRes, summaryRes, insightsRes] = await Promise.all([
-    fetch(`${BASE_URL}/api/profile/get`, {
+  const res = await fetch(
+    `${BASE_URL}/api/dashboard?month=${month}&year=${year}`,
+    {
       headers: { cookie: cookieHeader },
       cache: "no-store",
-    }),
-    fetch(`${BASE_URL}/api/dashboard/summary?month=${month}&year=${year}`, {
-      headers: { cookie: cookieHeader },
-      cache: "no-store",
-    }),
-    fetch(`${BASE_URL}/api/dashboard/insights`, {
-      headers: { cookie: cookieHeader },
-      cache: "no-store",
-    }),
-  ]);
+    },
+  );
 
-  if (!profileRes.ok) return null;
+  if (!res.ok) return null;
 
-  const profile = await profileRes.json();
-  const summary = await summaryRes.json();
-  const insights = await insightsRes.json();
-  const isDemoUser = profile.email === "test@mail.com";
+  const data = await res.json();
+  const isDemoUser = data.email === "test@mail.com";
 
   return (
     <>
@@ -46,13 +37,13 @@ export default async function DashboardPage() {
       )}
 
       <DashboardClient
-        userName={profile.name ?? ""}
-        goalAmount={profile.goalAmount ?? null}
-        goalYear={profile.goalYear ?? null}
+        userName={data.userName ?? ""}
+        goalAmount={data.goalAmount ?? null}
+        goalYear={data.goalYear ?? null}
         initialMonth={month}
         initialYear={year}
-        initialSummary={summary}
-        initialInsights={insights.insights ?? []}
+        initialSummary={data}
+        initialInsights={data.insights ?? []}
       />
     </>
   );

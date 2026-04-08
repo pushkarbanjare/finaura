@@ -31,13 +31,11 @@ export default function DashboardClient({
   async function applyFilter() {
     setLoading(true);
 
-    const [summaryRes, insightsRes] = await Promise.all([
-      fetch(`/api/dashboard/summary?month=${month}&year=${year}`),
-      fetch(`/api/dashboard/insights`),
-    ]);
+    const res = await fetch(`/api/dashboard?month=${month}&year=${year}`);
+    const data = await res.json();
 
-    setSummary(await summaryRes.json());
-    setInsights((await insightsRes.json()).insights ?? []);
+    setSummary(data);
+    setInsights(data.insights ?? []);
     setLoading(false);
   }
 
@@ -88,7 +86,7 @@ export default function DashboardClient({
         </p>
       ) : (
         <>
-        {/* charts */}
+          {/* charts */}
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="min-h-80 lg:h-80 flex-1 rounded-lg border border-foreground/20 p-4">
               <CategoryPieChart categoryTotals={summary.categoryTotals} />

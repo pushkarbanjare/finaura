@@ -1,8 +1,24 @@
 "use client";
 
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Label} from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  Label,
+} from "recharts";
 
-const COLORS = ["#818cf8", "#22d3ee", "#34d399", "#fbbf24", "#fb7185", "#a78bfa", "#60a5fa", "#2dd4bf"];
+const COLORS = [
+  "#818cf8",
+  "#22d3ee",
+  "#34d399",
+  "#fbbf24",
+  "#fb7185",
+  "#a78bfa",
+  "#60a5fa",
+  "#2dd4bf",
+];
 
 export default function CategoryPieChart({ categoryTotals }: any) {
   const data = Object.entries(categoryTotals).map(([name, value]) => ({
@@ -16,8 +32,8 @@ export default function CategoryPieChart({ categoryTotals }: any) {
 
   return (
     <div className="flex flex-col items-center w-full">
-      <div className="w-52 h-52 sm:w-56 sm:h-56">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="w-52 h-52 sm:w-56 sm:h-56 min-h-[220px]">
+        <ResponsiveContainer width="100%" height={220}>
           <PieChart>
             <Pie
               data={data}
@@ -63,7 +79,7 @@ export default function CategoryPieChart({ categoryTotals }: any) {
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm w-full">
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm w-full wrap-break-words">
         {data.map((entry, index) => (
           <div
             key={index}
@@ -73,7 +89,7 @@ export default function CategoryPieChart({ categoryTotals }: any) {
               className="h-3 w-3 rounded-full"
               style={{ backgroundColor: COLORS[index % COLORS.length] }}
             />
-            <span className="truncate">
+            <span className="wrap-break-words">
               {entry.name}: ₹{entry.value}
             </span>
           </div>

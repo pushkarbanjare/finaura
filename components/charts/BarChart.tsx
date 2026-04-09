@@ -1,6 +1,14 @@
 "use client";
 
-import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer} from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  ResponsiveContainer,
+} from "recharts";
 
 export default function MonthlyBarChart({ salary, totalSpend, savings }: any) {
   const data = [
@@ -10,8 +18,8 @@ export default function MonthlyBarChart({ salary, totalSpend, savings }: any) {
   ];
 
   return (
-    <div className="w-full h-[220px] sm:h-[260px] lg:h-[300px]">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="w-full min-h-[220px] sm:min-h-[260px] lg:min-h-[300px]">
+      <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} barSize={32}>
           <CartesianGrid
             strokeDasharray="2 2"

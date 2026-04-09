@@ -1,80 +1,64 @@
 # FinAura
 
-FinAura is a Personal Finance Management Platform designed to help users track their expenses, analyze spending patterns, and monitor financial goals through real-time analytics and automated categorization.The platform combines secure authentication, structured data processing, and interactive financial visualizations to deliver actionable insights into user spending behaviour.
+FinAura is an Automated Financial Intelligence Platform that transforms raw expense data into actionable savings strategies. By bridging the gap between current income and future financial targets, it provides users with high-performance data visualization and scalable financial planning tools.
 
 **Live at: https://finaura-app.vercel.app/**
 
 ## PROBLEM STATEMENT
 
-Most individuals track expenses manually or not at all. Traditional tracking methods:
-- Provide limited financial insights
-- Fail to visualize spending behaviour
-- Do not connect expenses with savings goals
+Traditional expense tracking is often manual, retrospective, and disconnected from long-term objectives. Most methods:
 
-This results in poor financial awareness and weak decision-making.
+- **Lack Depth**: Provide static lists rather than behavioral insights.
+- **Manual Friction**: High user effort leads to inconsistent tracking.
+- **Goal Isolation**: Expenses are viewed in a vacuum, failing to connect daily spending to future savings targets.
 
 ## SOLUTION
 
-FinAura provides an integrated expense intelligence platform that:
-- Records and categorizes expenses
-- Calculates savings and financial summaries
-- Generates monthly analytics dashboards
-- Visualizes financial behaviour
-- Tracks progress toward savings goals
+FinAura delivers an Expense Intelligence Ecosystem that:
+
+- **Automates Classification**: Uses an intelligent categorization engine to reduce manual input.
+- **Analyzes Volatility**: Calculates Month-over-Month (MoM) analytics to identify spending outliers.
+- **Forecasts Growth**: Connects current expenditure patterns with predictive goal-tracking modules.
+- **Visualizes Behavior**: Transforms data into interactive trend analysis and category distribution models.
 
 ## ARCHITECTURE
+
 1. **Frontend**
-    - Next.js App Router
-    - React client components
-    - Interactive financial charts (Recharts)
-    - Responsive dashboard UI
+   - **Next.js App Router**: Optimized for fast, edge-based rendering.
+   - **Recharts Integration**: Responsive, data-heavy visualizations for behavioral tracking.
 2. **Backend**
-    - Next.js API routes (REST architecture)
-    - JWT session-based authentication
-    - MongoDB database
-    - Zod schema validation
-    - Rate limiting middleware
+   - **LLM Ingestion Engine**: Integrated AI layer for semantic analysis and automated data labeling.
+   - **Zod Schema Validation**: Strict server-side type-safety and data integrity.
+   - **Singleton Pattern**: Optimized MongoDB/Mongoose connection pooling for serverless performance.
 3. **Security Layer**
-    - Bcrypt password hashing
-    - HTTP-only session cookies
-    - Request rate limiting
-    - Input validation schemas
+   - **Authentication**: JWT session management with Bcrypt hashing.
+   - **Data Protection**: HTTP-only cookies and protected middleware layers.
+   - **Traffic Control**: API rate-limiting to prevent brute-force and DDoS vectors.
 
 ## FEATURES
-- **Secure Authentication:** JWT session management with Bcrypt password hashing and HTTP-only cookies.
-- **Expense Intelligence:** Automated categorization engine with support for metadata and notes.
-- **Financial Analytics:** Dynamic dashboards using Recharts for category distribution and trend analysis.
-- **Goal Tracking:** Real-time monitoring of savings targets vs. actual expenditure.
-- **Data Integrity:** Strict server-side validation using Zod schemas and API rate limiting.
 
-## API MODULE
-1. **Authentication**: signup, login, logout
-2. **Expense Management**: add, update, delete, list expenses
-3. **Financial Analytics**: monthly summary, spending insights
-4. **User Profile**: fetch profile, update profile
-
-## DATABASE MODEL
-1. **User**: Name, Email, Password, Salary, Savings Goals.
-2. **Expense**: Amount, Item, Merchant, Category, Date, User Reference
+   - **Automated Intelligence**: Smart categorization of raw expense items using LLM and tranforms into structured financial buckets.
+   - **Predictive Goal Tracking**: Real-time monitoring of savings targets vs. actual expenditure velocity.
+   - **Volatility Analytics**: Dynamic dashboards utilizing MoM analysis to identify spending trends and anomalies.
+   - **Data Integrity**: Multi-layer validation ensuring zero-leakage in financial reporting.
 
 ## DATA PROCESSING FLOW
-1. User records expense
-2. Input validated via schema
-3. Category auto-generated
-4. Stored in MongoDB
-5. Monthly aggregation computed
-6. Dashboard analytics generated
-7. Visual charts rendered
+
+   1. **Ingestion**: User records expense; payload is validated via Zod schemas.
+   2. **Intelligence**: Category is auto-assigned; MoM volatility is updated in real-time.
+   3. **Storage**: Atomic transactions in MongoDB ensure data consistency.
+   4. **Aggregation**: Financial summaries are computed on-the-fly for the current billing cycle.
+   5. **Visualization**: Data is piped into Recharts for interactive behavioral analysis.
 
 ## TECH STACK
-- **Frontend**: Next.js, Tailwind CSS, Recharts
-- **Backend**: Next.js API Routes (Node.js)
-- **Database**: MongoDB with Mongoose ODM
-- **Security**: Zod (Schemas-based validation)
+
+   - **Frontend**: Next.js (React), Tailwind CSS, Recharts
+   - **Backend**: Node.js, MongoDB (Mongoose), Zod, LLM Ingestion Engine
+   - **Security**: JWT, Bcrypt, Rate-Limiting Middleware
 
 ## FUTURE IMPROVEMENTS
+
 - AI-based spending predictions
-- Bank API integration
 - Recurring expense detection
 - Anomaly detection in spending
 - Exportable financial reports

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getUserIdFromSession } from "@/lib/auth/session";
-import { getSummaryData } from "@/services/dashboard.service";
+import { getInsightsData, getSummaryData } from "@/services/dashboard.service";
+import { getProfile } from "@/services/profile.service";
 import { AppError } from "@/lib/errors";
 
 export async function GET(req: Request) {
@@ -16,10 +17,27 @@ export async function GET(req: Request) {
     const month = Number(searchParams.get("month") ?? now.getMonth());
     const year = Number(searchParams.get("year") ?? now.getFullYear());
 
-    // ========== service call ==========
-    const data = await getSummaryData(userId, month, year);
+    // ========== parallel service calls ==========
+    const [profile, summary, insightsData] = await Promise.all([
+      getProfile(userId),
+      getSummaryData(userId, month, year),
+      getInsightsData(userId),
+    ]);
 
-    return NextResponse.json(data, { status: 200 });
+    // ========== transform response ==========
+    const response = {
+      userName: profile.name,
+      goalAmount: profile.goalAmount,
+      goalYear: profile.goalYear,
+      salary: summary.salary,
+      totalSpend: summary.totalSpend,
+      savings: summary.savings,
+      categoryTotals: summary.categoryTotals,
+      dailySpend: summary.dailySpend,
+      insights: insightsData.insights,
+    };
+
+    return NextResponse.json(response, { status: 200 });
   } catch (error: any) {
     // ========== handling app error ==========
     if (error instanceof AppError) {
@@ -29,7 +47,7 @@ export async function GET(req: Request) {
       );
     }
 
-    console.error("DASHBOARD SUMMARY ERROR:", error);
+    console.error("DASHBOARD ERROR:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },

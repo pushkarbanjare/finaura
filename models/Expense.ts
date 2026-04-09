@@ -1,5 +1,6 @@
 import mongoose, { model, models, Schema } from "mongoose";
 
+// ========== schema definition of Expense table ==========
 const ExpenseSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
@@ -13,4 +14,5 @@ const ExpenseSchema = new Schema(
   { timestamps: false },
 );
 
+// ========== model defintion with serverless fix ==========
 export const Expense = models.Expense || model("Expense", ExpenseSchema);

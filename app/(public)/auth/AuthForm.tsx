@@ -9,7 +9,6 @@ export default function AuthForm() {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -62,7 +61,7 @@ export default function AuthForm() {
       </h1>
 
       {error && (
-        <div className="mb-4 rounded-md bg-red-500/10 text-red-600 px-3 py-2 text-sm">
+        <div className="mb-4 rounded-md bg-red-500/10 text-red-500 px-3 py-2 text-sm">
           {error}
         </div>
       )}

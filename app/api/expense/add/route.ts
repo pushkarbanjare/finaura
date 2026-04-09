@@ -1,61 +1,58 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import { Expense } from "@/models/Expense";
 import { getUserIdFromSession } from "@/lib/auth/session";
-import { generateCategory } from "@/lib/category";
 import { rateLimit } from "@/lib/security/rateLimit";
 import { addExpenseSchema } from "@/lib/validators/expense.schema";
+import { addExpense } from "@/services/expense.service";
+import { AppError, RateLimitError } from "@/lib/errors";
 
 export async function POST(req: Request) {
   try {
+    // ========== client identification ==========
     const ip =
       req.headers.get("x-forwarded-for") ??
       req.headers.get("x-real-ip") ??
       "unknown";
 
+    // ========== rate limit ==========
     const allowed = rateLimit(`expense:add:${ip}`, 30, 60_000);
-    if (!allowed) {
-      return NextResponse.json(
-        { error: "Too many requests. Slow down." },
-        { status: 429 },
-      );
-    }
+    if (!allowed)
+      throw new RateLimitError("Too many add requests, Try again later.");
 
+    // ========== auth ==========
     const userId = await getUserIdFromSession();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!userId) throw new AppError("Unauthorized", 401);
 
+    // ========== expense parsing ==========
     const body = addExpenseSchema.parse(await req.json());
-    const { amount, item, merchant, notes, date } = body;
 
-    await connectDB();
-
-    const category = generateCategory(item, merchant ?? "", notes ?? "");
-
-    const newExpense = await Expense.create({
-      userId,
-      amount,
-      item,
-      merchant,
-      notes,
-      date: date ? new Date(date) : new Date(),
-      category,
-    });
+    // ========== add expense logic ==========
+    const newExpense = await addExpense(userId, body);
 
     return NextResponse.json(
       { message: "Expense added", expense: newExpense },
       { status: 201 },
     );
   } catch (error: any) {
+    // ========== zod validation errors ==========
     if (error?.name === "ZodError") {
       return NextResponse.json(
-        { error: error.errors[0].message },
+        { error: error.issues[0].message },
         { status: 400 },
       );
     }
 
+    // ========== custom app errors ==========
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.statusCode },
+      );
+    }
+
     console.error("ADD EXPENSE ERROR:", error);
-    return NextResponse.json({ error: "Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

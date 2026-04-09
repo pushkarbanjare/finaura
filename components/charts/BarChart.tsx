@@ -18,10 +18,9 @@ export default function MonthlyBarChart({ salary, totalSpend, savings }: any) {
   ];
 
   return (
-    <div className="w-full h-[220px] sm:h-[260px] lg:h-[300px]">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="w-full min-h-[220px] sm:min-h-[260px] lg:min-h-[300px]">
+      <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} barSize={32}>
-          {/* Subtle grid for dark mode */}
           <CartesianGrid
             strokeDasharray="2 2"
             stroke="#334155"

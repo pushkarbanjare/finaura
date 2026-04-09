@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+// ========== add expense validation schema ==========
 export const addExpenseSchema = z.object({
   amount: z.number().positive(),
   item: z.string().min(1),
@@ -8,6 +9,7 @@ export const addExpenseSchema = z.object({
   date: z.string().optional(),
 });
 
+// ========== update expense validation schema ==========
 export const updateExpenseSchema = z.object({
   expenseId: z.string().min(1),
   amount: z.number().positive().optional(),

@@ -6,13 +6,8 @@ export async function POST() {
     { status: 200 },
   );
 
-  response.cookies.set("session", "", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 0,
-  });
+  // ========== removing cookies ==========
+  response.cookies.delete("session");
 
   return response;
 }

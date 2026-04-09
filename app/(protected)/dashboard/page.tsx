@@ -31,8 +31,7 @@ export default async function DashboardPage() {
     <>
       {isDemoUser && (
         <div className="mx-auto max-w-6xl px-4 pt-4 text-center text-sm text-foreground/60">
-          Please check <strong>December 2025</strong> and{" "}
-          <strong>January, March 2026</strong> for analytics.
+          Please check <strong>April 2025</strong> for analytics.
         </div>
       )}
 

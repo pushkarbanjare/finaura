@@ -3,6 +3,39 @@ import { connectDB } from "@/lib/db";
 import { AppError } from "@/lib/errors";
 import { Category } from "@/models/Category";
 import { Expense } from "@/models/Expense";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+// ========== LLM logic ==========
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+async function getLLMCategory(item: string, merchant?: string, notes?: string) {
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+  const text = `${item} ${merchant || ""} ${notes || ""}`;
+
+  const prompt = `
+Classify this expense into ONLY one category:
+
+Categories:
+Housing & Utilities,
+Food & Essentials,
+Transport & Travel,
+Health & Wellness,
+Personal & Lifestyle,
+Financial & Others,
+
+Input: "${text}"
+
+Rules:
+- Return ONLY one category name
+- No explanation
+- No extra words
+`;
+
+  const result = await model.generateContent(prompt);
+  const response = await result.response.text();
+
+  return response.trim();
+}
 
 // ========== smart categorization logic ==========
 async function getSmartCategory(
@@ -17,7 +50,36 @@ async function getSmartCategory(
   const existing = await Category.findOne({ keyword });
   if (existing) return existing.category;
 
-  const category = generateCategory(item, merchant || "", notes || "");
+  let category = generateCategory(item, merchant || "", notes || "");
+
+  const allowedCategories = [
+    "Housing & Utilities",
+    "Food & Essentials",
+    "Transport & Travel",
+    "Health & Wellness",
+    "Personal & Lifestyle",
+    "Financial & Others",
+  ];
+
+  if (category === "Other") {
+    try {
+      const llmCategory = await getLLMCategory(item, merchant, notes);
+      if (llmCategory) {
+        const cleaned = llmCategory.replace(/[\n.]/g, "").trim();
+
+        if (allowedCategories.includes(cleaned)) {
+          category = cleaned;
+
+          await Category.create({ keyword, category }).catch(() => {});
+          return category;
+        }
+      }
+    } catch (error) {
+      console.error("LLM failed:", error);
+    }
+
+    return category;
+  }
 
   try {
     await Category.create({ keyword, category });

@@ -1,6 +1,6 @@
 import { model, models, Schema } from "mongoose";
 
-// ========== schema definition ==========
+// ========== schema definition of User table ==========
 const UserSchema = new Schema(
   {
     name: { type: String, default: "" },

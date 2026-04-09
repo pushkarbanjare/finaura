@@ -1,6 +1,6 @@
 import mongoose, { model, models, Schema } from "mongoose";
 
-// ========== schema definition ==========
+// ========== schema definition of Expense table ==========
 const ExpenseSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },

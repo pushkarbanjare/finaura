@@ -1,3 +1,15 @@
+export function normalizeInput(
+  item: string,
+  merchant?: string,
+  notes?: string,
+) {
+  const text = `${merchant || ""} ${item} ${notes || ""}`.toLowerCase().trim();
+
+  const words = text.split(" ").filter(Boolean);
+
+  return words[0];
+}
+
 export function generateCategory(
   item: string,
   merchant: string,
@@ -5,94 +17,61 @@ export function generateCategory(
 ) {
   const text = `${item} ${merchant} ${notes}`.toLowerCase();
 
-  // FAST FOOD
-  if (
-    text.includes("pizza") ||
-    text.includes("burger") ||
-    text.includes("dominos") ||
-    text.includes("kfc") ||
-    text.includes("mcdonald") ||
-    text.includes("fries")
-  ) {
-    return "FastFood";
-  }
+  const rules = [
+    {
+      category: "FastFood",
+      keywords: ["pizza", "burger", "dominos", "kfc", "mcdonald", "fries"],
+    },
+    {
+      category: "Grocery",
+      keywords: [
+        "milk",
+        "grocery",
+        "vegetable",
+        "fruit",
+        "bigbasket",
+        "blinkit",
+      ],
+    },
+    {
+      category: "Travel",
+      keywords: ["uber", "ola", "flight", "bus", "train", "taxi"],
+    },
+    {
+      category: "Shopping",
+      keywords: ["shirt", "jeans", "amazon", "flipkart", "myntra", "shopping"],
+    },
+    {
+      category: "Entertainment",
+      keywords: ["movie", "netflix", "bookmyshow"],
+    },
+    {
+      category: "Health",
+      keywords: ["doctor", "hospital", "medicine", "pharmacy"],
+    },
+    {
+      category: "Bills",
+      keywords: [
+        "electricity",
+        "recharge",
+        "wifi",
+        "broadband",
+        "waterbill",
+        "gas",
+      ],
+    },
+    {
+      category: "Fuel",
+      keywords: ["fuel", "diesel"],
+    },
+    {
+      category: "Investments",
+      keywords: ["sip", "invest"],
+    },
+  ];
 
-  // GROCERY
-  if (
-    text.includes("milk") ||
-    text.includes("grocery") ||
-    text.includes("vegetable") ||
-    text.includes("fruit") ||
-    text.includes("bigbasket") ||
-    text.includes("blinkit")
-  ) {
-    return "Grocery";
-  }
-
-  // TRAVEL
-  if (
-    text.includes("uber") ||
-    text.includes("ola") ||
-    text.includes("flight") ||
-    text.includes("bus") ||
-    text.includes("train") ||
-    text.includes("taxi")
-  ) {
-    return "Travel";
-  }
-
-  // SHOPPING
-  if (
-    text.includes("shirt") ||
-    text.includes("jeans") ||
-    text.includes("amazon") ||
-    text.includes("flipkart") ||
-    text.includes("myntra") ||
-    text.includes("shopping")
-  ) {
-    return "Shopping";
-  }
-
-  // ENTERTAINMENT
-  if (
-    text.includes("movie") ||
-    text.includes("netflix") ||
-    text.includes("bookmyshow")
-  ) {
-    return "Entertainment";
-  }
-
-  // HEALTH
-  if (
-    text.includes("doctor") ||
-    text.includes("hospital") ||
-    text.includes("medicine") ||
-    text.includes("pharmacy")
-  ) {
-    return "Health";
-  }
-
-  // BILLS
-  if (
-    text.includes("electricity") ||
-    text.includes("recharge") ||
-    text.includes("wifi") ||
-    text.includes("broadband") ||
-    text.includes("waterbill") ||
-    text.includes("gas") ||
-    text.includes("bills")
-  ) {
-    return "Bills";
-  }
-
-  // FUEL
-  if (text.includes("fuel") || text.includes("diesel")) {
-    return "Fuel";
-  }
-
-  // INVESTMENT
-  if (text.includes("sip") || text.includes("invest")) {
-    return "Investments";
+  for (const rule of rules) {
+    if (rule.keywords.some((k) => text.includes(k))) return rule.category;
   }
 
   return "Other";

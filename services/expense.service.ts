@@ -1,14 +1,39 @@
-import { generateCategory } from "@/lib/category";
+import { generateCategory, normalizeInput } from "@/lib/category";
 import { connectDB } from "@/lib/db";
 import { AppError } from "@/lib/errors";
+import { Category } from "@/models/Category";
 import { Expense } from "@/models/Expense";
+
+// ========== smart categorization logic ==========
+async function getSmartCategory(
+  item: string,
+  merchant?: string,
+  notes?: string,
+) {
+  const keyword = normalizeInput(item, merchant, notes);
+
+  await connectDB();
+
+  const existing = await Category.findOne({ keyword });
+  if (existing) return existing.category;
+
+  const category = generateCategory(item, merchant || "", notes || "");
+
+  try {
+    await Category.create({ keyword, category });
+  } catch (error) {
+    console.error("Category save failed:", error);
+  }
+
+  return category;
+}
 
 // ========== add expense ==========
 export async function addExpense(userId: string, data: any) {
   await connectDB();
 
   const { amount, item, merchant, notes, date } = data;
-  const category = generateCategory(item, merchant ?? "", notes ?? "");
+  const category = await getSmartCategory(item, merchant ?? "", notes ?? "");
   const expense = await Expense.create({
     userId,
     amount,
@@ -56,7 +81,7 @@ export async function updateExpense(userId: string, data: any) {
 
   let category = expense.category;
   if (item || merchant || notes) {
-    category = generateCategory(
+    category = await getSmartCategory(
       item ?? expense.item,
       merchant ?? expense.merchant,
       notes ?? expense.notes,

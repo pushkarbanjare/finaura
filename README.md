@@ -6,7 +6,7 @@ FinAura is an Automated Financial Intelligence Platform that transforms raw expe
 
 ## PROBLEM STATEMENT
 
-Traditional expense tracking is often manual, retrospective, and disconnected from long-term objectives. Most methods:
+Traditional expense tracking is often manual, retrospective, and far from long-term objectives. Most methods:
 
 - **Lack Depth**: Provide static lists rather than behavioral insights.
 - **Manual Friction**: High user effort leads to inconsistent tracking.

@@ -42,9 +42,11 @@ export default function DashboardClient({
   const hasData = summary?.totalSpend > 0;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-10 space-y-2">
+    <div className="mx-auto max-w-6xl px-4 pb-10 space-y-4">
       {/* Header */}
-      <h1 className="text-2xl font-semibold pt-4">Hi {userName || "there"}</h1>
+      <h1 className="text-2xl font-semibold pt-4 text-white">
+        Hi {userName || "there"}
+      </h1>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3 text-sm">
@@ -74,7 +76,7 @@ export default function DashboardClient({
 
         <button
           onClick={applyFilter}
-          className="rounded-md border border-foreground/20 px-4 py-2 text-sm hover:bg-foreground/20 transition"
+          className="rounded-md bg-indigo-500/90 px-4 py-2 text-sm text-white hover:bg-indigo-500 transition shadow-md shadow-indigo-500/30"
         >
           {loading ? "Loading..." : "Apply"}
         </button>
@@ -88,11 +90,11 @@ export default function DashboardClient({
         <>
           {/* charts */}
           <div className="flex flex-col lg:flex-row gap-6">
-            <div className="min-h-80 lg:h-80 flex-1 rounded-lg border border-foreground/20 p-4">
+            <div className="min-h-80 lg:h-80 flex-1 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md p-4 shadow-lg shadow-indigo-500/10 overflow-y-auto">
               <CategoryPieChart categoryTotals={summary.categoryTotals} />
             </div>
 
-            <div className="min-h-80 lg:h-80 flex-1 rounded-lg border border-foreground/20 p-4">
+            <div className="min-h-80 lg:h-80 flex-1 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md p-4 shadow-lg shadow-indigo-500/10">
               <MonthlyBarChart
                 salary={summary.salary}
                 totalSpend={summary.totalSpend}
@@ -103,8 +105,8 @@ export default function DashboardClient({
 
           {/* summary & insights */}
           <div className="flex flex-col lg:flex-row gap-6">
-            <div className="flex-1 rounded-lg border border-foreground/20 p-4">
-              <h2 className="text-lg font-semibold mb-3">Summary</h2>
+            <div className="flex-1 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md p-4 shadow-lg shadow-indigo-500/10">
+              <h2 className="text-lg font-semibold mb-3 text-white">Summary</h2>
 
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -141,8 +143,10 @@ export default function DashboardClient({
               )}
             </div>
 
-            <div className="flex-1 rounded-lg border border-foreground/20 p-4">
-              <h2 className="text-lg font-semibold mb-3">Insights</h2>
+            <div className="flex-1 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md p-4 shadow-lg shadow-indigo-500/10">
+              <h2 className="text-lg font-semibold mb-3 text-white">
+                Insights
+              </h2>
               {insights.length ? (
                 insights.map((line, i) => (
                   <p key={i} className="text-sm text-foreground/80">

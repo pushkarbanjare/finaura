@@ -156,20 +156,20 @@ export default function ExpenseClient({
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-10">
+    <div className="mx-auto max-w-6xl px-4 pb-10 space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-5">
-        {/* ADD EXPENSE FORM */}
-        <div className="rounded-xl border border-foreground/20 bg-background p-5">
-          <h2 className="text-lg font-semibold mb-4">Add Expense</h2>
+        {/* add expense form */}
+        <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-md p-5 shadow-lg shadow-indigo-500/10">
+          <h2 className="text-lg font-semibold mb-4 text-white">Add Expense</h2>
 
           {message && (
-            <p className="rounded-md bg-green-900/30 text-green-400 px-3 py-2 text-sm">
+            <p className="rounded-md bg-green-500/10 text-green-400 px-3 py-2 text-sm border border-green-500/20">
               {message}
             </p>
           )}
 
           {error && (
-            <div className="rounded-md bg-red-900/30 text-red-400 px-3 py-2 text-sm">
+            <div className="rounded-md bg-red-500/10 text-red-400 px-3 py-2 text-sm border border-red-500/20">
               {error}
             </div>
           )}
@@ -182,49 +182,51 @@ export default function ExpenseClient({
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="Amount"
-              className="rounded-md border border-foreground/20 bg-background px-3 py-2 outline-none focus:border-foreground/40"
+              className="rounded-md border border-white/10 bg-white/5 px-3 py-2 text-white outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/40 transition"
             />
             <input
               value={item}
               onChange={(e) => setItem(e.target.value)}
               placeholder="Item"
-              className="rounded-md border border-foreground/20 bg-background px-3 py-2 outline-none focus:border-foreground/40"
+              className="rounded-md border border-white/10 bg-white/5 px-3 py-2 text-white outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/40 transition"
             />
             <input
               value={merchant}
               onChange={(e) => setMerchant(e.target.value)}
               placeholder="Merchant (optional)"
-              className="rounded-md border border-foreground/20 bg-background px-3 py-2 outline-none focus:border-foreground/40"
+              className="rounded-md border border-white/10 bg-white/5 px-3 py-2 text-white outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/40 transition"
             />
             <input
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Notes (optional)"
-              className="rounded-md border border-foreground/20 bg-background px-3 py-2 outline-none focus:border-foreground/40"
+              className="rounded-md border border-white/10 bg-white/5 px-3 py-2 text-white outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/40 transition"
             />
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="rounded-md border border-foreground/20 bg-background px-3 py-2 outline-none focus:border-foreground/40"
+              className="rounded-md border border-white/10 bg-white/5 px-3 py-2 text-white outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/40 transition"
             />
 
             <button
               disabled={loading}
-              className="border border-foreground/50 rounded-lg text-sm p-2 hover:bg-foreground/20 disabled:opacity-50"
+              className="rounded-md bg-indigo-500/80 py-2 text-sm text-white hover:bg-indigo-500 transition shadow-md shadow-indigo-500/30 disabled:opacity-50"
             >
               {loading ? "Adding..." : "Add Expense"}
             </button>
           </form>
         </div>
 
-        {/* EXPENSE LIST */}
-        <div className="md:col-span-2 rounded-xl border border-foreground/20 bg-background p-5 flex flex-col">
-          <h2 className="text-lg font-semibold mb-4">Your Expenses</h2>
+        {/* expense list */}
+        <div className="md:col-span-2 rounded-xl border border-white/10 bg-white/5 backdrop-blur-md p-5 flex flex-col shadow-lg shadow-indigo-500/10">
+          <h2 className="text-lg font-semibold mb-4 text-white">
+            Your Expenses
+          </h2>
 
           <div className="flex-1 max-h-[520px] overflow-y-auto pr-2 space-y-3">
             {expenses.length === 0 ? (
-              <div className="flex h-full items-center justify-center text-sm text-foreground/50 text-center px-6">
+              <div className="flex h-full items-center justify-center text-sm text-white/40 text-center px-6">
                 No expenses found yet. <br />
                 Add your first expense to see it here.
               </div>
@@ -232,14 +234,14 @@ export default function ExpenseClient({
               expenses.map((exp) => (
                 <div
                   key={exp._id}
-                  className="rounded-lg border border-foreground/15 p-4"
+                  className="rounded-lg border border-white/10 bg-black/50 p-4 backdrop-blur-sm"
                 >
                   <div className="flex justify-between items-start gap-4">
                     <div>
                       <p className="text-base font-medium">
                         ₹{exp.amount} · {exp.item}
                       </p>
-                      <p className="text-xs text-foreground/60 mt-1">
+                      <p className="text-xs text-white/60 mt-1">
                         {exp.category}
                         {exp.date && ` · ${exp.date.slice(0, 10)}`}
                       </p>
@@ -248,13 +250,13 @@ export default function ExpenseClient({
                     <div className="flex gap-2 text-xs">
                       <button
                         onClick={() => startEdit(exp)}
-                        className="rounded-md border border-foreground/20 px-2 py-1 hover:bg-foreground/10"
+                        className="rounded-md border border-white/20 px-2 py-1 text-white/80 hover:bg-white/10 transition"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDelete(exp._id)}
-                        className="rounded-md border border-red-500/30 px-2 py-1 text-red-400 hover:bg-red-500/10"
+                        className="rounded-md border border-red-500/30 px-2 py-1 text-red-400 hover:bg-red-500/10 transition"
                       >
                         Delete
                       </button>
@@ -307,7 +309,7 @@ export default function ExpenseClient({
                         className="rounded-md border border-foreground/20 bg-background px-2 py-1"
                       />
 
-                      <button className="sm:col-span-2 mt-1 rounded-md border border-foreground/30 py-1 hover:bg-foreground/10">
+                      <button className="sm:col-span-2 mt-1 rounded-md bg-indigo-500/80 py-1 text-white hover:bg-indigo-500 transition shadow-md shadow-indigo-500/30">
                         Save Changes
                       </button>
                     </form>

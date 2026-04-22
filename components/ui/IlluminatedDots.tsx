@@ -17,8 +17,8 @@ export default function IlluminatedDots() {
     canvas.height = height;
 
     const dotGap = 22;
-    const baseAlpha = 0.1;
-    const radius = 120;
+    const baseAlpha = 0.15;
+    const radius = 160;
 
     let mouseX = -9999;
     let mouseY = -9999;
@@ -34,7 +34,7 @@ export default function IlluminatedDots() {
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           const illum = Math.max(0, (radius - dist) / radius);
-          const alpha = Math.min(1, baseAlpha + illum * 0.5);
+          const alpha = Math.min(1, baseAlpha + illum * 0.9);
 
           ctx.fillStyle = `rgba(148,163,184,${alpha})`;
           ctx.beginPath();

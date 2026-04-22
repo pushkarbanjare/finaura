@@ -19,7 +19,7 @@ export default async function Navbar() {
       <div className="flex items-center justify-between px-6 py-4">
         {/* Branding */}
         <Link href="/dashboard" className="font-heading text-2xl font-semibold">
-          Finaura
+          FinAura
         </Link>
 
         {/* Desktop nav */}

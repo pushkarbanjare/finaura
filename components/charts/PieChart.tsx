@@ -79,7 +79,7 @@ export default function CategoryPieChart({ categoryTotals }: any) {
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm w-full wrap-break-words">
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm w-full max-h-40 overflow-y-auto pr-1">
         {data.map((entry, index) => (
           <div
             key={index}

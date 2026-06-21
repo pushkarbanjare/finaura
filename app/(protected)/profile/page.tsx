@@ -1,23 +1,11 @@
 import ProfileClient from "./ProfileClient";
-import { headers, cookies } from "next/headers";
+import { getUserIdFromSession } from "@/lib/auth/session";
+import { getProfile } from "@/services/profile.service";
 
 export default async function ProfilePage() {
-  const headersList = await headers();
-  const cookieStore = await cookies();
+  const userId = await getUserIdFromSession();
+  if (!userId) return null;
 
-  const host = headersList.get("host");
-  const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-  const baseUrl = `${protocol}://${host}`;
-
-  const res = await fetch(`${baseUrl}/api/profile/get`, {
-    headers: {
-      cookie: cookieStore.toString(),
-    },
-    cache: "no-store",
-  });
-
-  if (!res.ok) return null;
-
-  const profile = await res.json();
+  const profile = await getProfile(userId);
   return <ProfileClient initialProfile={profile} />;
 }

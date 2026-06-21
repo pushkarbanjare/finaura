@@ -125,8 +125,14 @@ export async function deleteExpense(userId: string, expenseId: string) {
 // ========== list expense ==========
 export async function listExpense(userId: string) {
   await connectDB();
-
-  return Expense.find({ userId }).sort({ date: -1 });
+  const expenses = await Expense.find({ userId }).sort({ date: -1 }).lean();
+  
+  return expenses.map((exp) => ({
+    ...exp,
+    _id: exp._id.toString(),
+    userId: exp.userId.toString(),
+    date: exp.date?.toISOString(),
+  }));
 }
 
 // ========== update expense ==========

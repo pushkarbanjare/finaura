@@ -1,23 +1,11 @@
 import ExpenseClient from "./ExpenseClient";
-import { headers, cookies } from "next/headers";
+import { getUserIdFromSession } from "@/lib/auth/session";
+import { listExpense } from "@/services/expense.service";
 
 export default async function ExpensePage() {
-  const headersList = await headers();
-  const cookieStore = await cookies();
+  const userId = await getUserIdFromSession();
+  if (!userId) return null;
 
-  const host = headersList.get("host");
-  const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-  const baseUrl = `${protocol}://${host}`;
-
-  const res = await fetch(`${baseUrl}/api/expense/list`, {
-    headers: {
-      cookie: cookieStore.toString(),
-    },
-    cache: "no-store",
-  });
-
-  if (!res.ok) return null;
-
-  const data = await res.json();
-  return <ExpenseClient initialExpenses={data.expenses ?? []} />;
+  const expenses = await listExpense(userId);
+  return <ExpenseClient initialExpenses={expenses} />;
 }

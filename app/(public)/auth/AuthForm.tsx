@@ -42,7 +42,7 @@ export default function AuthForm() {
 
       if (mode === "login") {
         router.replace("/dashboard");
-        router.refresh();
+        // router.refresh();
       } else {
         setMode("login");
         setError("Signup successful. Please login.");

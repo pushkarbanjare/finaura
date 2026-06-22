@@ -4,6 +4,7 @@ import { AppError } from "@/lib/errors";
 import { Category } from "@/models/Category";
 import { Expense } from "@/models/Expense";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { categorizationQueue } from "@/lib/queue";
 
 // ========== LLM logic ==========
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
@@ -39,6 +40,7 @@ Rules:
 
 // ========== smart categorization logic ==========
 async function getSmartCategory(
+  expenseId: string,
   item: string,
   merchant?: string,
   notes?: string,
@@ -46,39 +48,20 @@ async function getSmartCategory(
   const keyword = normalizeInput(item, merchant, notes);
 
   await connectDB();
-
   const existing = await Category.findOne({ keyword });
   if (existing) return existing.category;
 
   let category = generateCategory(item, merchant || "", notes || "");
 
-  const allowedCategories = [
-    "Housing & Utilities",
-    "Food & Essentials",
-    "Transport & Travel",
-    "Health & Wellness",
-    "Personal & Lifestyle",
-    "Financial & Others",
-  ];
-
   if (category === "Other") {
-    try {
-      const llmCategory = await getLLMCategory(item, merchant, notes);
-      if (llmCategory) {
-        const cleaned = llmCategory.replace(/[\n.]/g, "").trim();
-
-        if (allowedCategories.includes(cleaned)) {
-          category = cleaned;
-
-          await Category.create({ keyword, category }).catch(() => {});
-          return category;
-        }
-      }
-    } catch (error) {
-      console.error("LLM failed:", error);
-    }
-
-    return category;
+    await categorizationQueue.add("categorize", {
+      expenseId,
+      keyword,
+      item,
+      merchant: merchant || "",
+      notes: notes || "",
+    });
+    return "Processing";
   }
 
   try {
@@ -86,7 +69,6 @@ async function getSmartCategory(
   } catch (error) {
     console.error("Category save failed:", error);
   }
-
   return category;
 }
 
@@ -126,7 +108,7 @@ export async function deleteExpense(userId: string, expenseId: string) {
 export async function listExpense(userId: string) {
   await connectDB();
   const expenses = await Expense.find({ userId }).sort({ date: -1 }).lean();
-  
+
   return expenses.map((exp) => ({
     ...exp,
     _id: exp._id.toString(),

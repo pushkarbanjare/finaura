@@ -1,16 +1,15 @@
-// import { Queue } from "bullmq";
-// import IORedis from "ioredis";
+import { Redis } from "@upstash/redis";
 
-// const connection = new IORedis(process.env.REDIS_URL!, { maxRetriesPerRequest: null, tls: {}, });
-// export const categorizationQueue = new Queue("categorization", { connection });
-
-import { Queue } from "bullmq";
-
-export const categorizationQueue = new Queue("categorization", {
-  connection: {
-    host: process.env.REDIS_HOST!,
-    port: Number(process.env.REDIS_PORT),
-    password: process.env.REDIS_PASSWORD!,
-    tls: {},
-  },
+export const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 });
+
+export async function enqueueExpenseJob(job: {
+  expenseId: string;
+  item: string;
+  merchant?: string;
+  notes?: string;
+}) {
+  await redis.rpush("expense-category-jobs", JSON.stringify(job));
+}

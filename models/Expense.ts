@@ -10,6 +10,7 @@ const ExpenseSchema = new Schema(
     notes: { type: String, default: "" },
     date: { type: Date, default: Date.now() },
     category: { type: String, default: "Uncategorized" },
+    status: { type: String, enum: ["PROCESSING", "COMPLETED"], default: "COMPLETED" },
   },
   { timestamps: false },
 );

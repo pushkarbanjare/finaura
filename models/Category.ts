@@ -3,17 +3,24 @@ import { model, models, Schema } from "mongoose";
 // ========== schema definition of Category table ==========
 const CategorySchema = new Schema(
   {
-    keyword: {
+    lookupKey: {
       type: String,
       required: true,
-      lowercase: true,
-      trim: true,
-      index: true,
       unique: true,
+      index: true,
+      trim: true,
+      lowercase: true,
     },
-    category: { type: String, required: true, trim: true },
+
+    category: {
+      type: String,
+      required: true,
+      trim: true,
+    },
   },
-  { timestamps: false },
+  {
+    timestamps: true,
+  },
 );
 
 // ========== model defintion with serverless fix ==========

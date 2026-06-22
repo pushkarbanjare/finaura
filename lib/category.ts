@@ -1,13 +1,5 @@
-export function normalizeInput(
-  item: string,
-  merchant?: string,
-  notes?: string,
-) {
-  const text = `${merchant || ""} ${item} ${notes || ""}`.toLowerCase().trim();
-
-  const words = text.split(" ").filter(Boolean);
-
-  return words[0];
+export function buildLookupKey(item: string, merchant?: string) {
+  return `${item.trim().toLowerCase()}|${merchant?.trim().toLowerCase() || ""}`;
 }
 
 export function generateCategory(

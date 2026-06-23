@@ -123,19 +123,16 @@ export default function DashboardClient({
                 </div>
               </div>
 
-              {goalAmount && summary.savings >= 0 && (
+              {goalAmount && summary.totalSavedAllTime >= 0 && (
                 <div className="mt-4">
                   <p className="text-sm mb-1">
-                    Goal Progress: ₹{summary.savings} / ₹{goalAmount}
+                    Goal Progress: ₹{summary.totalSavedAllTime} / ₹{goalAmount}
                   </p>
                   <div className="h-2 w-full rounded-full bg-foreground/10">
                     <div
                       className="h-full rounded-full bg-foreground transition-all"
                       style={{
-                        width: `${Math.min(
-                          (summary.savings / goalAmount) * 100,
-                          100,
-                        )}%`,
+                        width: `${Math.min((summary.totalSavedAllTime / goalAmount) * 100, 100)}%`,
                       }}
                     />
                   </div>

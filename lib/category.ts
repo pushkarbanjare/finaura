@@ -103,6 +103,7 @@ export function generateCategory(
         "course",
         "education",
         "fee",
+        "fees"
       ],
     },
   ];

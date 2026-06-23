@@ -10,6 +10,7 @@ type Expense = {
   notes?: string;
   date?: string;
   category: string;
+  status: string;
 };
 
 export default function ExpenseClient({
@@ -42,14 +43,21 @@ export default function ExpenseClient({
 
   useEffect(() => {
     if (!message && !error) return;
-
     const timer = setTimeout(() => {
       setMessage(null);
       setError(null);
     }, 3000); // 3 seconds
-
     return () => clearTimeout(timer);
   }, [message, error]);
+
+  useEffect(() => {
+    const hasProcessing = expenses.some((exp) => exp.status === "PROCESSING");
+    if (!hasProcessing) return;
+    const interval = setInterval(() => {
+      reload();
+    }, 3000); // 3 seconds
+    return () => clearInterval(interval);
+  }, [expenses]);
 
   async function reload() {
     const res = await fetch("/api/expense/list");

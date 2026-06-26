@@ -1,64 +1,38 @@
 # FinAura
+An AI-powered personal finance platform that automates expense tracking, budgeting, and transaction categorization using an asynchronous Redis-Spring Boot processing pipeline.
 
-FinAura is an Automated Financial Intelligence Platform that transforms raw expense data into actionable savings strategies. By bridging the gap between current income and future financial targets, it provides users with high-performance data visualization and scalable financial planning tools.
-
-**Live at: https://finaura-app.vercel.app/**
+**Live Demo: https://finaura-app.vercel.app/**
 
 ## PROBLEM STATEMENT
-
-Traditional expense tracking is often manual, retrospective, and far from long-term objectives. Most methods:
-
-- **Lack Depth**: Provide static lists rather than behavioral insights.
-- **Manual Friction**: High user effort leads to inconsistent tracking.
-- **Goal Isolation**: Expenses are viewed in a vacuum, failing to connect daily spending to future savings targets.
+Managing personal expenses manually is repetitive and time-consuming. Traditional expense trackers require users to categorize every transaction themselves and often provide limited insights into spending behavior.
 
 ## SOLUTION
-
-FinAura delivers an Expense Intelligence Ecosystem that:
-
-- **Automates Classification**: Uses an intelligent categorization engine to reduce manual input.
-- **Analyzes Volatility**: Calculates Month-over-Month (MoM) analytics to identify spending outliers.
-- **Forecasts Growth**: Connects current expenditure patterns with predictive goal-tracking modules.
-- **Visualizes Behavior**: Transforms data into interactive trend analysis and category distribution models.
+FinAura automates expense management by combining intelligent categorization, real-time analytics, and asynchronous AI processing.
+- Automatically categorizes expenses into financial buckets.
+- Tracks monthly budgets and spending patterns.
+- Visualizes expense distribution and monthly trends.
+- Minimizes AI cost using multi-layer caching.
 
 ## ARCHITECTURE
+`User -> Next.js Frontend -> Node.js APIs -> MongoDB (Expense saved as PROCESSING) -> Redis Queue (Upstash) -> Spring Boot Worker -> File Cache -> MongoDB Cache -> Groq LLM -> MongoDB Updated (COMPLETED) -> Frontend Auto Refresh`
 
-1. **Frontend**
-   - **Next.js App Router**: Optimized for fast, edge-based rendering.
-   - **Recharts Integration**: Responsive, data-heavy visualizations for behavioral tracking.
-2. **Backend**
-   - **LLM Ingestion Engine**: Integrated AI layer for semantic analysis and automated data labeling.
-   - **Zod Schema Validation**: Strict server-side type-safety and data integrity.
-   - **Singleton Pattern**: Optimized MongoDB/Mongoose connection pooling for serverless performance.
-3. **Security Layer**
-   - **Authentication**: JWT session management with Bcrypt hashing.
-   - **Data Protection**: HTTP-only cookies and protected middleware layers.
-   - **Traffic Control**: API rate-limiting to prevent brute-force and DDoS vectors.
-
-## FEATURES
-
-   - **Automated Intelligence**: Smart categorization of raw expense items using LLM and tranforms into structured financial buckets.
-   - **Predictive Goal Tracking**: Real-time monitoring of savings targets vs. actual expenditure velocity.
-   - **Volatility Analytics**: Dynamic dashboards utilizing MoM analysis to identify spending trends and anomalies.
-   - **Data Integrity**: Multi-layer validation ensuring zero-leakage in financial reporting.
-
-## DATA PROCESSING FLOW
-
-   1. **Ingestion**: User records expense; payload is validated via Zod schemas.
-   2. **Intelligence**: Category is auto-assigned; MoM volatility is updated in real-time.
-   3. **Storage**: Atomic transactions in MongoDB ensure data consistency.
-   4. **Aggregation**: Financial summaries are computed on-the-fly for the current billing cycle.
-   5. **Visualization**: Data is piped into Recharts for interactive behavioral analysis.
+## KEY FEATURES
+- AI-powered automatic expense categorization.
+- Budget tracking with monthly spending insights.
+- Interactive dashboards using Recharts.
+- Background processing using Redis and Spring Boot.
+- Cache-first categorization to minimize expensive LLM calls.
+- Optimized MongoDB aggregation pipelines for fast dashboard loading.
 
 ## TECH STACK
-
-   - **Frontend**: Next.js (React), Tailwind CSS, Recharts
-   - **Backend**: Node.js, MongoDB (Mongoose), Zod, LLM Ingestion Engine
-   - **Security**: JWT, Bcrypt, Rate-Limiting Middleware
+- **Frontend**: Next.js, Tailwind CSS, Recharts
+- **Backend**: Node.js, Spring Boot, MongoDB, Redis (Upstash)
+- **AI**: Groq LLM, Rule-based File Cache, MongoDB Cache
+- **Security**: JWT, Bcrypt, HTTP-only Cookies, Rate Limiting
 
 ## FUTURE IMPROVEMENTS
-
-- AI-based spending predictions
+- OCR-based receipt scanning
+- AI-powered spending recommendations
 - Recurring expense detection
-- Anomaly detection in spending
+- Multi-currency support
 - Exportable financial reports
